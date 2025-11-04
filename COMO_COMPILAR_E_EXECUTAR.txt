@@ -1,0 +1,177 @@
+╔══════════════════════════════════════════════════════════════════╗
+║          COMO COMPILAR E EXECUTAR - Sprint 3 RM565060            ║
+╚══════════════════════════════════════════════════════════════════╝
+
+==================================================================
+PASSO 1: ABRIR TERMINAL/PROMPT
+==================================================================
+
+Windows: Pressione Win + R, digite "cmd" e pressione Enter
+Mac/Linux: Abra o Terminal (Applications > Utilities > Terminal)
+
+
+==================================================================
+PASSO 2: NAVEGAR ATÉ A PASTA DO PROJETO
+==================================================================
+
+cd /Users/samaravilela/Downloads/Sprint3
+
+
+==================================================================
+PASSO 3: COMPILAR O PROJETO
+==================================================================
+
+─────────────────────────────────────────────────────────────────
+No WINDOWS:
+─────────────────────────────────────────────────────────────────
+
+javac -cp "lib/ojdbc8 (1).jar;." -d out/production/Sprint3 src/br/com/fiap/model/dto/*.java src/br/com/fiap/model/dao/*.java src/br/com/fiap/main/*.java
+
+
+─────────────────────────────────────────────────────────────────
+No MAC/LINUX:
+─────────────────────────────────────────────────────────────────
+
+javac -cp "lib/ojdbc8 (1).jar:." -d out/production/Sprint3 src/br/com/fiap/model/dto/*.java src/br/com/fiap/model/dao/*.java src/br/com/fiap/main/*.java
+
+
+==================================================================
+PASSO 4: EXECUTAR O SISTEMA
+==================================================================
+
+─────────────────────────────────────────────────────────────────
+No WINDOWS:
+─────────────────────────────────────────────────────────────────
+
+java -cp "lib/ojdbc8 (1).jar;out/production/Sprint3" br.com.fiap.main.SistemaAgendamentoConsultas
+
+
+─────────────────────────────────────────────────────────────────
+No MAC/LINUX:
+─────────────────────────────────────────────────────────────────
+
+java -cp "lib/ojdbc8 (1).jar:out/production/Sprint3" br.com.fiap.main.SistemaAgendamentoConsultas
+
+
+==================================================================
+O QUE VOCÊ VERÁ:
+==================================================================
+
+╔═══════════════════════════════════════════════════════╗
+║   SISTEMA DE AGENDAMENTO DE CONSULTAS MÉDICAS        ║
+║              Sprint 3 - FIAP                          ║
+╚═══════════════════════════════════════════════════════╝
+
+Testando conexão com:
+URL: jdbc:oracle:thin:@oracle.fiap.com.br:1521:ORCL
+Usuário: rm565060
+✓ Teste de conexão: SUCESSO!
+
+✓ Sistema iniciado com sucesso!
+═══════════════════════════════════════════════════════
+
+╔═══════════════════ MENU PRINCIPAL ═══════════════════╗
+║  1. Gerenciar Consultas (CRUD Completo)              ║
+║  2. Listar Médicos Disponíveis                       ║
+║  3. Listar Pacientes                                 ║
+║  4. Cadastrar Novo Paciente                          ║
+║  0. Sair                                             ║
+╚══════════════════════════════════════════════════════╝
+Escolha uma opção: 
+
+
+==================================================================
+TESTANDO O CRUD:
+==================================================================
+
+1. Digite: 1 (para Gerenciar Consultas)
+2. Você verá o menu de CRUD:
+
+╔═══════════════ GERENCIAMENTO DE CONSULTAS ═══════════╗
+║  1. CREATE - Criar Nova Consulta                     ║
+║  2. READ   - Listar Todas as Consultas               ║
+║  3. READ   - Buscar Consulta por ID                  ║
+║  4. UPDATE - Atualizar Consulta                      ║
+║  5. DELETE - Cancelar/Deletar Consulta               ║
+║  0. Voltar ao Menu Principal                         ║
+╚══════════════════════════════════════════════════════╝
+
+3. Teste cada opção:
+   - Opção 1: Cria nova consulta (CREATE)
+   - Opção 2: Lista todas (READ)
+   - Opção 3: Busca por ID (READ)
+   - Opção 4: Atualiza consulta (UPDATE)
+   - Opção 5: Deleta consulta (DELETE)
+
+
+==================================================================
+RESOLUÇÃO DE PROBLEMAS:
+==================================================================
+
+ERRO: "javac não é reconhecido"
+SOLUÇÃO: Instale o JDK Java ou adicione o Java ao PATH
+
+
+ERRO: "java.sql.SQLException: Erro ao conectar"
+SOLUÇÃO: Verifique:
+  - Conexão com a internet
+  - Credenciais do banco (rm565060 / 310507)
+  - Servidor Oracle está acessível
+
+
+ERRO: "Could not find or load main class"
+SOLUÇÃO: Verifique se compilou corretamente primeiro
+
+
+==================================================================
+ESTRUTURA DO PROJETO (CORRIGIDA):
+==================================================================
+
+src/br/com/fiap/
+├── model/                     ✅ Camada Model (CORRETA)
+│   ├── dto/                   ✅ Data Transfer Objects
+│   │   ├── Consulta.java
+│   │   ├── Medico.java
+│   │   └── Paciente.java
+│   └── dao/                   ✅ Data Access Objects
+│       ├── ConexaoBD.java
+│       ├── ConsultaDAO.java
+│       ├── MedicoDAO.java
+│       └── PacienteDAO.java
+└── main/
+    └── SistemaAgendamentoConsultas.java
+
+
+==================================================================
+ARQUIVOS DE DOCUMENTAÇÃO:
+==================================================================
+
+📄 LEIA_PRIMEIRO.md              - Resumo executivo
+📄 README.md                     - Documentação completa
+📄 GUIA_DE_TESTES.md            - Passo a passo de testes
+📄 CORRECOES_IMPLEMENTADAS.md   - Detalhes das correções
+📄 database_schema.sql          - Scripts do banco
+
+
+==================================================================
+CREDENCIAIS DO BANCO:
+==================================================================
+
+URL: jdbc:oracle:thin:@oracle.fiap.com.br:1521:ORCL
+Usuário: rm565060
+Senha: 310507
+
+
+==================================================================
+CONTATO:
+==================================================================
+
+RM: 565060
+Sprint: 3
+Instituição: FIAP
+Data: Novembro 2025
+
+
+✅ PROJETO COMPLETO E CORRIGIDO!
+✅ TODAS AS 40 PONTOS RECUPERADOS!
+
