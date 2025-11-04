@@ -8,12 +8,17 @@ import java.util.List;
 
 /**
  * Teste simples para verificar se tudo está funcionando
+ * 
+ * @author Samara Vilela de Oliveira - RM 566133
+ * @author Felipe Conte Ferreira - RM 562248
+ * @author Altamir Lima - RM 562906
  */
 public class TesteSimples {
     
     public static void main(String[] args) {
         System.out.println("╔════════════════════════════════════════════╗");
         System.out.println("║   TESTE RÁPIDO - SISTEMA EASEHC           ║");
+        System.out.println("║   Grupo: Samara, Felipe, Altamir          ║");
         System.out.println("╚════════════════════════════════════════════╝\n");
         
         // Teste 1: Conexão com banco

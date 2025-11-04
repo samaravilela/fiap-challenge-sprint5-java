@@ -14,7 +14,9 @@ import java.util.Scanner;
  * Sistema de Agendamento de Consultas
  * Demonstra operações CRUD (Create, Read, Update, Delete) com banco de dados Oracle
  * 
- * @author RM565060
+ * @author Samara Vilela de Oliveira - RM 566133
+ * @author Felipe Conte Ferreira - RM 562248
+ * @author Altamir Lima - RM 562906
  */
 public class SistemaAgendamentoConsultas {
     
@@ -31,6 +33,11 @@ public class SistemaAgendamentoConsultas {
         System.out.println("╔═══════════════════════════════════════════════════════╗");
         System.out.println("║   SISTEMA DE AGENDAMENTO DE CONSULTAS MÉDICAS        ║");
         System.out.println("║              Sprint 4 - FIAP                          ║");
+        System.out.println("║                                                       ║");
+        System.out.println("║   Grupo:                                              ║");
+        System.out.println("║   • Samara Vilela de Oliveira - RM 566133            ║");
+        System.out.println("║   • Felipe Conte Ferreira - RM 562248                ║");
+        System.out.println("║   • Altamir Lima - RM 562906                         ║");
         System.out.println("╚═══════════════════════════════════════════════════════╝");
         System.out.println();
 
@@ -65,7 +72,7 @@ public class SistemaAgendamentoConsultas {
 
     private static boolean exibirMenuPrincipal() {
         System.out.println("\n╔═══════════════════ MENU PRINCIPAL ═══════════════════╗");
-        System.out.println("║  1. Gerenciar Consultas (CRUD Completo)              ║");
+        System.out.println("║  1. Gerenciar Consultas             ║");
         System.out.println("║  2. Listar Médicos Disponíveis                       ║");
         System.out.println("║  3. Listar Pacientes                                 ║");
         System.out.println("║  4. Cadastrar Novo Paciente                          ║");
