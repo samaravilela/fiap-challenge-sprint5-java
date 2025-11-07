@@ -397,6 +397,7 @@
 │ + criar(Consulta): Consulta             │
 │ + buscarPorId(Long): Consulta           │
 │ + listarTodos(): List<Consulta>         │
+│   // Retorna apenas consultas AGENDADAS│
 │ + atualizar(Consulta): boolean          │
 │ + deletar(Long): boolean                │
 │ + listarPorPaciente(Long):              │
@@ -631,6 +632,7 @@
 │ + criar(Consulta): Consulta             │
 │ + buscarPorId(Long): Consulta           │
 │ + listarTodos(): List<Consulta>         │
+│   // Retorna apenas consultas AGENDADAS│
 │ + atualizar(Consulta): boolean          │
 │ + deletar(Long): boolean                │
 │ + cancelarConsulta(Long, String):       │
@@ -664,6 +666,7 @@
 - Prioridade: Alta, Baixa, Normal
 - **Regra**: Médico não pode ter consultas sobrepostas
 - **Regra**: Não pode cancelar consulta já realizada
+- **Nota**: `listarTodos()` retorna apenas consultas com status "Agendada"
 
 ### 3.4 EspecialidadeService
 ```
@@ -849,6 +852,7 @@
 │ + ConsultaResource()                    │
 │ @GET                                    │
 │ + listarTodos(): Response               │
+│   // Lista apenas consultas AGENDADAS  │
 │ @GET @Path("/{id}")                     │
 │ + buscarPorId(Long): Response           │
 │ @POST                                   │
@@ -875,14 +879,14 @@
 ```
 
 **Endpoints**:
-- `GET /consultas` - Lista todas
+- `GET /consultas` - Lista todas as consultas AGENDADAS
 - `GET /consultas/{id}` - Busca por ID
 - `POST /consultas` - Cria nova
 - `PUT /consultas/{id}` - Atualiza
 - `DELETE /consultas/{id}` - Deleta
 - `GET /consultas/paciente/{id}` - Lista por paciente
 - `GET /consultas/medico/{id}` - Lista por médico
-- `GET /consultas/status/{status}` - Lista por status
+- `GET /consultas/status/{status}` - Lista por status (Agendada, Cancelada, Realizada)
 - `PUT /consultas/{id}/cancelar` - Cancela consulta
 
 ### 4.5 EspecialidadeResource
