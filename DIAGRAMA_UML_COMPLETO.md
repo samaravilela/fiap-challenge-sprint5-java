@@ -20,11 +20,11 @@ Instale a extensão "Markdown Preview Mermaid Support"
 
 ---
 
-## 📐 DIAGRAMA COMPLETO - ARQUITETURA EM CAMADAS
+## 📐 DIAGRAMA SIMPLIFICADO - ARQUITETURA EM CAMADAS
 
 ```mermaid
 graph TB
-    subgraph EXCEPTION["🚨 CAMADA DE EXCEÇÕES"]
+    subgraph EXCEPTION["🚨 EXCEÇÕES"]
         RuntimeEx[RuntimeException]
         ValidationEx[ValidationException]
         ResourceNotFoundEx[ResourceNotFoundException]
@@ -37,147 +37,167 @@ graph TB
         RuntimeEx --> DatabaseEx
     end
 
-    subgraph RESOURCE["🌐 CAMADA RESOURCE - API REST"]
-        PacienteRes[PacienteResource<br/>+ listarTodos<br/>+ buscarPorId<br/>+ criar<br/>+ atualizar<br/>+ deletar<br/>+ buscarPorNome]
-        MedicoRes[MedicoResource<br/>+ listarTodos<br/>+ buscarPorId<br/>+ criar<br/>+ atualizar<br/>+ deletar<br/>+ buscarPorCrm<br/>+ listarPorEspecialidade]
-        ConsultaRes[ConsultaResource<br/>+ listarTodos ⚠️ AGENDADAS<br/>+ buscarPorId<br/>+ criar<br/>+ atualizar<br/>+ deletar<br/>+ listarPorPaciente<br/>+ listarPorMedico<br/>+ listarPorStatus<br/>+ cancelar]
-        EspecialidadeRes[EspecialidadeResource<br/>+ listarTodos<br/>+ buscarPorId<br/>+ criar<br/>+ atualizar<br/>+ deletar]
-        LocalizacaoRes[LocalizacaoResource<br/>+ listarTodos<br/>+ buscarPorId<br/>+ criar<br/>+ atualizar<br/>+ deletar<br/>+ listarPorCidade]
-        ResponseEntity[ResponseEntity<T><br/>+ body: T<br/>+ statusCode: int<br/>+ message: String]
+    subgraph RESOURCE["🌐 RESOURCE - API REST"]
+        PacienteRes[PacienteResource<br/>CRUD + buscarPorNome]
+        MedicoRes[MedicoResource<br/>CRUD + buscarPorCrm]
+        ConsultaRes[ConsultaResource<br/>CRUD + listarAgendadas ⚠️<br/>+ cancelar]
+        EspecialidadeRes[EspecialidadeResource<br/>CRUD]
+        LocalizacaoRes[LocalizacaoResource<br/>CRUD + listarPorCidade]
+        ResponseEntity[ResponseEntity&lt;T&gt;]
     end
 
-    subgraph SERVICE["⚙️ CAMADA SERVICE - REGRAS DE NEGÓCIO"]
-        PacienteServ[PacienteService<br/>+ criar<br/>+ buscarPorId<br/>+ listarTodos<br/>+ atualizar<br/>+ deletar<br/>+ buscarPorNome<br/>- validarPaciente<br/>- validarIdPaciente]
-        MedicoServ[MedicoService<br/>+ criar<br/>+ buscarPorId<br/>+ listarTodos<br/>+ atualizar<br/>+ deletar<br/>+ buscarPorCrm<br/>+ listarPorEspecialidade<br/>- validarMedico<br/>- validarCrmUnico]
-        ConsultaServ[ConsultaService<br/>+ criar<br/>+ buscarPorId<br/>+ listarTodos ⚠️ AGENDADAS<br/>+ atualizar<br/>+ deletar<br/>+ cancelar<br/>+ listarPorPaciente<br/>+ listarPorMedico<br/>+ listarPorStatus<br/>- validarConsulta<br/>- validarDisponibilidade<br/>- validarEntidadesRelacionadas]
-        EspecialidadeServ[EspecialidadeService<br/>+ criar<br/>+ buscarPorId<br/>+ listarTodos<br/>+ atualizar<br/>+ deletar<br/>- validarEspecialidade]
-        LocalizacaoServ[LocalizacaoService<br/>+ criar<br/>+ buscarPorId<br/>+ listarTodos<br/>+ atualizar<br/>+ deletar<br/>+ listarPorCidade<br/>- validarLocalizacao]
+    subgraph SERVICE["⚙️ SERVICE - NEGÓCIO"]
+        PacienteServ[PacienteService<br/>CRUD + Validações]
+        MedicoServ[MedicoService<br/>CRUD + Validações<br/>+ CRM único]
+        ConsultaServ[ConsultaService<br/>CRUD + Validações<br/>+ Conflito horários<br/>+ listarAgendadas ⚠️]
+        EspecialidadeServ[EspecialidadeService<br/>CRUD + Validações]
+        LocalizacaoServ[LocalizacaoService<br/>CRUD + Validações]
     end
 
-    subgraph DAO["💾 CAMADA DAO - PERSISTÊNCIA"]
-        PacienteDAO[PacienteDAO<br/>+ criar<br/>+ buscarPorId<br/>+ listarTodos<br/>+ atualizar<br/>+ deletar<br/>+ buscarPorNome]
-        MedicoDAO[MedicoDAO<br/>+ criar<br/>+ buscarPorId<br/>+ listarTodos<br/>+ atualizar<br/>+ deletar<br/>+ buscarPorCrm<br/>+ listarPorEspecialidade]
-        ConsultaDAO[ConsultaDAO<br/>+ criar<br/>+ buscarPorId<br/>+ listarTodos ⚠️ AGENDADAS<br/>+ atualizar<br/>+ deletar<br/>+ listarPorPaciente<br/>+ listarPorMedico<br/>+ listarPorStatus]
-        EspecialidadeDAO[EspecialidadeDAO<br/>+ criar<br/>+ buscarPorId<br/>+ listarTodos<br/>+ atualizar<br/>+ deletar]
-        LocalizacaoDAO[LocalizacaoDAO<br/>+ criar<br/>+ buscarPorId<br/>+ listarTodos<br/>+ atualizar<br/>+ deletar<br/>+ listarPorCidade]
-        CancelamentoDAO[CancelamentoDAO<br/>+ criar<br/>+ buscarPorId<br/>+ listarTodos<br/>+ atualizar<br/>+ deletar<br/>+ listarPorConsulta]
-        HistoricoDAO[HistoricoMedicoDAO<br/>+ criar<br/>+ buscarPorId<br/>+ listarTodos<br/>+ atualizar<br/>+ deletar<br/>+ listarPorPaciente]
-        OrientacaoDAO[OrientacaoDAO<br/>+ criar<br/>+ buscarPorId<br/>+ listarTodos<br/>+ atualizar<br/>+ deletar<br/>+ listarPorConsulta]
-        ConexaoBD[ConexaoBD SINGLETON<br/>+ getConexao<br/>+ commit<br/>+ rollback<br/>+ fecharConexao<br/>+ testarConexao]
+    subgraph DAO["💾 DAO - PERSISTÊNCIA"]
+        PacienteDAO[PacienteDAO<br/>CRUD]
+        MedicoDAO[MedicoDAO<br/>CRUD]
+        ConsultaDAO[ConsultaDAO<br/>CRUD<br/>listarAgendadas ⚠️]
+        EspecialidadeDAO[EspecialidadeDAO<br/>CRUD]
+        LocalizacaoDAO[LocalizacaoDAO<br/>CRUD]
+        CancelamentoDAO[CancelamentoDAO<br/>CRUD]
+        HistoricoDAO[HistoricoMedicoDAO<br/>CRUD]
+        OrientacaoDAO[OrientacaoDAO<br/>CRUD]
+        ConexaoBD[ConexaoBD<br/>SINGLETON]
     end
 
-    subgraph MODEL["📦 CAMADA MODEL - DTOs"]
-        Paciente[Paciente<br/>- idPaciente: Long<br/>- nomeCompleto: String<br/>- dataNascimento: LocalDate<br/>- genero: String<br/>- telefone: String<br/>- tipoSanguineo: String<br/>- alergias: String]
-        Medico[Medico<br/>- idMedico: Long<br/>- nomeCompleto: String<br/>- crm: String<br/>- telefone: String<br/>- email: String]
-        Consulta[Consulta<br/>- idConsulta: Long<br/>- idPaciente: Long<br/>- idMedico: Long<br/>- idLocalizacao: Long<br/>- idEspecialidade: Long<br/>- dataHora: LocalDateTime<br/>- duracaoMinutos: Integer<br/>- status: String<br/>- observacoes: String<br/>- prioridade: String]
-        Especialidade[Especialidade<br/>- idEspecialidade: Long<br/>- nomeEspecialidade: String<br/>- areaMedica: String<br/>- tempoMedioConsulta: Integer]
-        Localizacao[Localizacao<br/>- idLocalizacao: Long<br/>- nomeUnidade: String<br/>- endereco: String<br/>- estado: String<br/>- cidade: String<br/>- pais: String<br/>- horarioFuncionamento: String<br/>- telefone: String]
-        Cancelamento[Cancelamento<br/>- idAjuste: Long<br/>- idConsulta: Long<br/>- tipoAjuste: String<br/>- motivoSolicitacao: String<br/>- novaDataHora: LocalDateTime]
-        HistoricoMedico[HistoricoMedico<br/>- idHistorico: Long<br/>- idPaciente: Long<br/>- diagnostico: String<br/>- tratamento: String<br/>- medicacao: String<br/>- observacoesHistorico: String<br/>- dataAcesso: LocalDate]
-        Orientacao[Orientacao<br/>- idOrientacao: Long<br/>- idConsulta: Long<br/>- tipoExame: String<br/>- instrucoesPreparacao: String<br/>- recomendacoesPos: String]
+    subgraph MODEL["📦 MODEL - DTOs"]
+        Paciente[Paciente]
+        Medico[Medico]
+        Consulta[Consulta]
+        Especialidade[Especialidade]
+        Localizacao[Localizacao]
+        Cancelamento[Cancelamento]
+        HistoricoMedico[HistoricoMedico]
+        Orientacao[Orientacao]
     end
 
     %% Relacionamentos Resource -> Service
-    PacienteRes -->|usa| PacienteServ
-    MedicoRes -->|usa| MedicoServ
-    ConsultaRes -->|usa| ConsultaServ
-    EspecialidadeRes -->|usa| EspecialidadeServ
-    LocalizacaoRes -->|usa| LocalizacaoServ
+    PacienteRes --> PacienteServ
+    MedicoRes --> MedicoServ
+    ConsultaRes --> ConsultaServ
+    EspecialidadeRes --> EspecialidadeServ
+    LocalizacaoRes --> LocalizacaoServ
 
-    PacienteRes -.->|retorna| ResponseEntity
-    MedicoRes -.->|retorna| ResponseEntity
-    ConsultaRes -.->|retorna| ResponseEntity
-    EspecialidadeRes -.->|retorna| ResponseEntity
-    LocalizacaoRes -.->|retorna| ResponseEntity
+    PacienteRes -.-> ResponseEntity
+    MedicoRes -.-> ResponseEntity
+    ConsultaRes -.-> ResponseEntity
+    EspecialidadeRes -.-> ResponseEntity
+    LocalizacaoRes -.-> ResponseEntity
 
     %% Relacionamentos Service -> DAO
-    PacienteServ -->|usa| PacienteDAO
-    MedicoServ -->|usa| MedicoDAO
-    ConsultaServ -->|usa| ConsultaDAO
-    ConsultaServ -->|usa| PacienteDAO
-    ConsultaServ -->|usa| MedicoDAO
-    EspecialidadeServ -->|usa| EspecialidadeDAO
-    LocalizacaoServ -->|usa| LocalizacaoDAO
+    PacienteServ --> PacienteDAO
+    MedicoServ --> MedicoDAO
+    ConsultaServ --> ConsultaDAO
+    ConsultaServ --> PacienteDAO
+    ConsultaServ --> MedicoDAO
+    EspecialidadeServ --> EspecialidadeDAO
+    LocalizacaoServ --> LocalizacaoDAO
 
     %% Relacionamentos DAO -> ConexaoBD
-    PacienteDAO -->|usa| ConexaoBD
-    MedicoDAO -->|usa| ConexaoBD
-    ConsultaDAO -->|usa| ConexaoBD
-    EspecialidadeDAO -->|usa| ConexaoBD
-    LocalizacaoDAO -->|usa| ConexaoBD
-    CancelamentoDAO -->|usa| ConexaoBD
-    HistoricoDAO -->|usa| ConexaoBD
-    OrientacaoDAO -->|usa| ConexaoBD
+    PacienteDAO --> ConexaoBD
+    MedicoDAO --> ConexaoBD
+    ConsultaDAO --> ConexaoBD
+    EspecialidadeDAO --> ConexaoBD
+    LocalizacaoDAO --> ConexaoBD
+    CancelamentoDAO --> ConexaoBD
+    HistoricoDAO --> ConexaoBD
+    OrientacaoDAO --> ConexaoBD
 
     %% Relacionamentos DAO -> Model
-    PacienteDAO -.->|manipula| Paciente
-    MedicoDAO -.->|manipula| Medico
-    ConsultaDAO -.->|manipula| Consulta
-    EspecialidadeDAO -.->|manipula| Especialidade
-    LocalizacaoDAO -.->|manipula| Localizacao
-    CancelamentoDAO -.->|manipula| Cancelamento
-    HistoricoDAO -.->|manipula| HistoricoMedico
-    OrientacaoDAO -.->|manipula| Orientacao
+    PacienteDAO -.-> Paciente
+    MedicoDAO -.-> Medico
+    ConsultaDAO -.-> Consulta
+    EspecialidadeDAO -.-> Especialidade
+    LocalizacaoDAO -.-> Localizacao
+    CancelamentoDAO -.-> Cancelamento
+    HistoricoDAO -.-> HistoricoMedico
+    OrientacaoDAO -.-> Orientacao
 
     %% Relacionamentos entre Models
-    Consulta -.->|referencia| Paciente
-    Consulta -.->|referencia| Medico
-    Consulta -.->|referencia| Especialidade
-    Consulta -.->|referencia| Localizacao
-    Cancelamento -.->|referencia| Consulta
-    Orientacao -.->|referencia| Consulta
-    HistoricoMedico -.->|referencia| Paciente
+    Consulta -.-> Paciente
+    Consulta -.-> Medico
+    Consulta -.-> Especialidade
+    Consulta -.-> Localizacao
+    Cancelamento -.-> Consulta
+    Orientacao -.-> Consulta
+    HistoricoMedico -.-> Paciente
 
-    %% Exceções usadas pelas camadas
-    PacienteServ -.->|lança| ValidationEx
-    PacienteServ -.->|lança| ResourceNotFoundEx
-    MedicoServ -.->|lança| ValidationEx
-    MedicoServ -.->|lança| ResourceNotFoundEx
-    ConsultaServ -.->|lança| ValidationEx
-    ConsultaServ -.->|lança| ResourceNotFoundEx
-    ConsultaServ -.->|lança| BusinessRuleEx
-    PacienteDAO -.->|lança| DatabaseEx
-    MedicoDAO -.->|lança| DatabaseEx
-    ConsultaDAO -.->|lança| DatabaseEx
+    %% Exceções
+    ConsultaServ -.-> ValidationEx
+    ConsultaServ -.-> ResourceNotFoundEx
+    ConsultaServ -.-> BusinessRuleEx
+    ConsultaDAO -.-> DatabaseEx
 
-    style RuntimeEx fill:#ff6b6b
-    style ValidationEx fill:#ffa07a
-    style ResourceNotFoundEx fill:#ffa07a
-    style BusinessRuleEx fill:#ffa07a
-    style DatabaseEx fill:#ffa07a
+    style RuntimeEx fill:#ff6b6b,color:#fff
+    style ValidationEx fill:#ffa07a,color:#fff
+    style ResourceNotFoundEx fill:#ffa07a,color:#fff
+    style BusinessRuleEx fill:#ffa07a,color:#fff
+    style DatabaseEx fill:#ffa07a,color:#fff
     
-    style PacienteRes fill:#4ecdc4
-    style MedicoRes fill:#4ecdc4
-    style ConsultaRes fill:#4ecdc4
-    style EspecialidadeRes fill:#4ecdc4
-    style LocalizacaoRes fill:#4ecdc4
-    style ResponseEntity fill:#95e1d3
+    style PacienteRes fill:#4ecdc4,color:#000
+    style MedicoRes fill:#4ecdc4,color:#000
+    style ConsultaRes fill:#4ecdc4,color:#000
+    style EspecialidadeRes fill:#4ecdc4,color:#000
+    style LocalizacaoRes fill:#4ecdc4,color:#000
+    style ResponseEntity fill:#95e1d3,color:#000
     
-    style PacienteServ fill:#f9ca24
-    style MedicoServ fill:#f9ca24
-    style ConsultaServ fill:#f9ca24
-    style EspecialidadeServ fill:#f9ca24
-    style LocalizacaoServ fill:#f9ca24
+    style PacienteServ fill:#f9ca24,color:#000
+    style MedicoServ fill:#f9ca24,color:#000
+    style ConsultaServ fill:#f9ca24,color:#000
+    style EspecialidadeServ fill:#f9ca24,color:#000
+    style LocalizacaoServ fill:#f9ca24,color:#000
     
-    style PacienteDAO fill:#a29bfe
-    style MedicoDAO fill:#a29bfe
-    style ConsultaDAO fill:#a29bfe
-    style EspecialidadeDAO fill:#a29bfe
-    style LocalizacaoDAO fill:#a29bfe
-    style CancelamentoDAO fill:#a29bfe
-    style HistoricoDAO fill:#a29bfe
-    style OrientacaoDAO fill:#a29bfe
-    style ConexaoBD fill:#6c5ce7
+    style PacienteDAO fill:#a29bfe,color:#fff
+    style MedicoDAO fill:#a29bfe,color:#fff
+    style ConsultaDAO fill:#a29bfe,color:#fff
+    style EspecialidadeDAO fill:#a29bfe,color:#fff
+    style LocalizacaoDAO fill:#a29bfe,color:#fff
+    style CancelamentoDAO fill:#a29bfe,color:#fff
+    style HistoricoDAO fill:#a29bfe,color:#fff
+    style OrientacaoDAO fill:#a29bfe,color:#fff
+    style ConexaoBD fill:#6c5ce7,color:#fff
     
-    style Paciente fill:#74b9ff
-    style Medico fill:#74b9ff
-    style Consulta fill:#74b9ff
-    style Especialidade fill:#74b9ff
-    style Localizacao fill:#74b9ff
-    style Cancelamento fill:#74b9ff
-    style HistoricoMedico fill:#74b9ff
-    style Orientacao fill:#74b9ff
+    style Paciente fill:#74b9ff,color:#000
+    style Medico fill:#74b9ff,color:#000
+    style Consulta fill:#74b9ff,color:#000
+    style Especialidade fill:#74b9ff,color:#000
+    style Localizacao fill:#74b9ff,color:#000
+    style Cancelamento fill:#74b9ff,color:#000
+    style HistoricoMedico fill:#74b9ff,color:#000
+    style Orientacao fill:#74b9ff,color:#000
 ```
+
+---
+
+## ✨ MELHORIAS DA VERSÃO SIMPLIFICADA
+
+### **O que foi otimizado:**
+
+✅ **Redução visual em ~70%**
+- Removidos detalhes de métodos individuais
+- Mantido apenas "CRUD" para operações básicas
+- Destacados apenas métodos especiais
+
+✅ **Mais legível**
+- Boxes menores e mais limpos
+- Menos linhas cruzadas
+- Foco na arquitetura geral
+
+✅ **Mantém todas as 32 classes**
+- Nenhuma informação perdida
+- Estrutura completa preservada
+- Relacionamentos claros
+
+✅ **Destaque para o importante**
+- ⚠️ "listarAgendadas" em destaque
+- Regras de negócio principais visíveis
+- Padrões Singleton identificados
 
 ---
 
