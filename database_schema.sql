@@ -1,17 +1,10 @@
--- ###################################################################
--- PROJETO EASEHC - DDL + DML (Oracle)
--- Script completo com criação de tabelas e dados de teste
--- ###################################################################
 
--- 1) LIMPEZA (opcional - cuidado em produção!)
-BEGIN
-   FOR cur IN (SELECT table_name FROM user_tables WHERE table_name LIKE 'T_EASEHC_%') LOOP
-      EXECUTE IMMEDIATE 'DROP TABLE ' || cur.table_name || ' CASCADE CONSTRAINTS';
-   END LOOP;
-END;
-/
+-- ###################################################################
+-- PROJETO EASEHC - DDL + DML + DQL (Oracle)
+-- Arquivo: projeto_easehc_oracle.sql
+-- ###################################################################
+-- 1) CRIAÇÃO DE TABELAS (DDL)
 
--- 2) CRIAÇÃO DE TABELAS (DDL)
 
 -- TABELA PACIENTE
 CREATE TABLE T_EASEHC_PACIENTE (
@@ -119,7 +112,6 @@ CREATE TABLE T_EASEHC_ORIENTACAO (
   CONSTRAINT PK_ORIENT PRIMARY KEY (ID_ORIENT)
 );
 
--- 3) CONSTRAINTS (FOREIGN KEYS)
 
 ALTER TABLE T_EASEHC_MED_ESP
   ADD CONSTRAINT FK_MEDESP_MED FOREIGN KEY (ID_MEDICO)
@@ -157,89 +149,5 @@ ALTER TABLE T_EASEHC_ORIENTACAO
   ADD CONSTRAINT FK_ORI_CONS FOREIGN KEY (ID_CONSULTA)
     REFERENCES T_EASEHC_CONSULTA (ID_CONSULTA);
 
--- 4) SEQUENCES (para auto-incremento)
-
-CREATE SEQUENCE SEQ_PACIENTE START WITH 1 INCREMENT BY 1;
-CREATE SEQUENCE SEQ_MEDICO START WITH 1 INCREMENT BY 1;
-CREATE SEQUENCE SEQ_ESPECIALIDADE START WITH 1 INCREMENT BY 1;
-CREATE SEQUENCE SEQ_LOCALIZACAO START WITH 1 INCREMENT BY 1;
-CREATE SEQUENCE SEQ_CONSULTA START WITH 1 INCREMENT BY 1;
-CREATE SEQUENCE SEQ_CANREM START WITH 1 INCREMENT BY 1;
-CREATE SEQUENCE SEQ_HISTORICO START WITH 1 INCREMENT BY 1;
-CREATE SEQUENCE SEQ_ORIENTACAO START WITH 1 INCREMENT BY 1;
-
--- 5) INSERÇÃO DE DADOS DE TESTE (DML)
-
--- PACIENTES
-INSERT INTO T_EASEHC_PACIENTE VALUES (1, 'Maria Silva Santos', TO_DATE('1985-05-15', 'YYYY-MM-DD'), 'F', '11987654321', 'A+', 'Penicilina');
-INSERT INTO T_EASEHC_PACIENTE VALUES (2, 'João Pedro Oliveira', TO_DATE('1990-08-20', 'YYYY-MM-DD'), 'M', '11976543210', 'O+', 'Nenhuma');
-INSERT INTO T_EASEHC_PACIENTE VALUES (3, 'Ana Carolina Costa', TO_DATE('1978-03-10', 'YYYY-MM-DD'), 'F', '11965432109', 'B+', 'Lactose');
-INSERT INTO T_EASEHC_PACIENTE VALUES (4, 'Carlos Eduardo Souza', TO_DATE('1995-12-25', 'YYYY-MM-DD'), 'M', '11954321098', 'AB+', 'Nenhuma');
-INSERT INTO T_EASEHC_PACIENTE VALUES (5, 'Beatriz Ferreira Lima', TO_DATE('2000-07-08', 'YYYY-MM-DD'), 'F', '11943210987', 'A-', 'Aspirina');
-
--- MÉDICOS
-INSERT INTO T_EASEHC_MEDICO VALUES (1, 'Dr. Roberto Almeida', 'CRM/SP 123456', '1133334444', 'roberto.almeida@easehc.com.br');
-INSERT INTO T_EASEHC_MEDICO VALUES (2, 'Dra. Patricia Mendes', 'CRM/SP 234567', '1133335555', 'patricia.mendes@easehc.com.br');
-INSERT INTO T_EASEHC_MEDICO VALUES (3, 'Dr. Fernando Santos', 'CRM/SP 345678', '1133336666', 'fernando.santos@easehc.com.br');
-INSERT INTO T_EASEHC_MEDICO VALUES (4, 'Dra. Juliana Costa', 'CRM/SP 456789', '1133337777', 'juliana.costa@easehc.com.br');
-INSERT INTO T_EASEHC_MEDICO VALUES (5, 'Dr. Marcelo Lima', 'CRM/SP 567890', '1133338888', 'marcelo.lima@easehc.com.br');
-
--- ESPECIALIDADES
-INSERT INTO T_EASEHC_ESPECIALIDADE VALUES (1, 'Cardiologia', 'Clinica Medica', 30);
-INSERT INTO T_EASEHC_ESPECIALIDADE VALUES (2, 'Pediatria', 'Clinica Medica', 30);
-INSERT INTO T_EASEHC_ESPECIALIDADE VALUES (3, 'Ortopedia', 'Cirurgia', 45);
-INSERT INTO T_EASEHC_ESPECIALIDADE VALUES (4, 'Dermatologia', 'Clinica Medica', 30);
-INSERT INTO T_EASEHC_ESPECIALIDADE VALUES (5, 'Ginecologia', 'Clinica Medica', 30);
-INSERT INTO T_EASEHC_ESPECIALIDADE VALUES (6, 'Neurologia', 'Clinica Medica', 45);
-
--- ASSOCIAÇÃO MÉDICO-ESPECIALIDADE
-INSERT INTO T_EASEHC_MED_ESP VALUES (1, 1); -- Dr. Roberto: Cardiologia
-INSERT INTO T_EASEHC_MED_ESP VALUES (2, 2); -- Dra. Patricia: Pediatria
-INSERT INTO T_EASEHC_MED_ESP VALUES (3, 3); -- Dr. Fernando: Ortopedia
-INSERT INTO T_EASEHC_MED_ESP VALUES (4, 4); -- Dra. Juliana: Dermatologia
-INSERT INTO T_EASEHC_MED_ESP VALUES (5, 5); -- Dr. Marcelo: Ginecologia
-INSERT INTO T_EASEHC_MED_ESP VALUES (1, 6); -- Dr. Roberto também atende Neurologia
-
--- LOCALIZAÇÕES
-INSERT INTO T_EASEHC_LOCALIZACAO VALUES (1, 'EaseHC Paulista', 'Av. Paulista, 1000', 'SP', 'São Paulo', 'Brasil', '08:00-18:00', '1130001000');
-INSERT INTO T_EASEHC_LOCALIZACAO VALUES (2, 'EaseHC Pinheiros', 'Rua dos Pinheiros, 500', 'SP', 'São Paulo', 'Brasil', '07:00-19:00', '1130002000');
-INSERT INTO T_EASEHC_LOCALIZACAO VALUES (3, 'EaseHC Vila Mariana', 'Av. Domingos de Morais, 2000', 'SP', 'São Paulo', 'Brasil', '08:00-20:00', '1130003000');
-INSERT INTO T_EASEHC_LOCALIZACAO VALUES (4, 'EaseHC Moema', 'Av. Ibirapuera, 3000', 'SP', 'São Paulo', 'Brasil', '07:00-22:00', '1130004000');
-
--- CONSULTAS DE EXEMPLO
-INSERT INTO T_EASEHC_CONSULTA VALUES (1, 1, 1, 1, 1, TO_TIMESTAMP('2025-11-10 09:00:00', 'YYYY-MM-DD HH24:MI:SS'), 30, 'Realizada', 'Consulta de rotina', 'Normal');
-INSERT INTO T_EASEHC_CONSULTA VALUES (2, 2, 2, 2, 2, TO_TIMESTAMP('2025-11-12 14:30:00', 'YYYY-MM-DD HH24:MI:SS'), 30, 'Realizada', 'Vacinação', 'Normal');
-INSERT INTO T_EASEHC_CONSULTA VALUES (3, 3, 3, 3, 3, TO_TIMESTAMP('2025-11-15 10:00:00', 'YYYY-MM-DD HH24:MI:SS'), 45, 'Agendada', 'Dor no joelho', 'Alta');
-INSERT INTO T_EASEHC_CONSULTA VALUES (4, 4, 4, 1, 4, TO_TIMESTAMP('2025-11-20 15:00:00', 'YYYY-MM-DD HH24:MI:SS'), 30, 'Agendada', 'Consulta dermatológica', 'Normal');
-INSERT INTO T_EASEHC_CONSULTA VALUES (5, 5, 5, 2, 5, TO_TIMESTAMP('2025-11-25 11:30:00', 'YYYY-MM-DD HH24:MI:SS'), 30, 'Agendada', 'Check-up anual', 'Normal');
-
--- HISTÓRICO MÉDICO
-INSERT INTO T_EASEHC_HISTORICO VALUES (1, 1, 'Hipertensão', 'Medicação contínua', 'Losartana 50mg', 'Paciente controlado', TO_DATE('2025-01-15', 'YYYY-MM-DD'));
-INSERT INTO T_EASEHC_HISTORICO VALUES (2, 3, 'Artrose joelho direito', 'Fisioterapia', 'Anti-inflamatório', 'Em tratamento', TO_DATE('2025-02-20', 'YYYY-MM-DD'));
-
--- ORIENTAÇÕES
-INSERT INTO T_EASEHC_ORIENTACAO VALUES (1, 1, 'Eletrocardiograma', 'Jejum de 4 horas', 'Retornar em 30 dias');
-INSERT INTO T_EASEHC_ORIENTACAO VALUES (2, 2, 'Hemograma completo', 'Jejum de 8 horas', 'Resultados em 3 dias');
-
--- 6) COMMIT DAS ALTERAÇÕES
-COMMIT;
-
--- 7) VERIFICAÇÃO
-SELECT 'PACIENTES' AS TABELA, COUNT(*) AS QTD FROM T_EASEHC_PACIENTE
-UNION ALL
-SELECT 'MEDICOS', COUNT(*) FROM T_EASEHC_MEDICO
-UNION ALL
-SELECT 'ESPECIALIDADES', COUNT(*) FROM T_EASEHC_ESPECIALIDADE
-UNION ALL
-SELECT 'LOCALIZACOES', COUNT(*) FROM T_EASEHC_LOCALIZACAO
-UNION ALL
-SELECT 'CONSULTAS', COUNT(*) FROM T_EASEHC_CONSULTA
-UNION ALL
-SELECT 'HISTORICO', COUNT(*) FROM T_EASEHC_HISTORICO
-UNION ALL
-SELECT 'ORIENTACOES', COUNT(*) FROM T_EASEHC_ORIENTACAO;
-
--- MENSAGEM FINAL
-SELECT '✓ Banco de dados EaseHC criado e populado com sucesso!' AS STATUS FROM DUAL;
 
 
