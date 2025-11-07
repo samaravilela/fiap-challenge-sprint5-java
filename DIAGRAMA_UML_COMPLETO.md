@@ -292,7 +292,6 @@ graph TB
 
 ---
 
-**Última Atualização**: Novembro 2025  
 **Versão**: 1.0 - Completa e Atualizada  
 **Projeto**: EaseHC - Sistema de Gestão de Consultas Médicas  
 **Grupo**: Samara Vilela (RM566133), Felipe Conte (RM562248), Altamir Lima (RM562906)
