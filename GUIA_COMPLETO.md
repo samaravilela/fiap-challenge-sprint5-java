@@ -162,6 +162,8 @@ private static final String USUARIO = "seu_rm";      // ← ALTERAR
 private static final String SENHA = "sua_senha";     // ← ALTERAR
 ```
 
+Observação:  testar com o meu usuário que já está configurado.
+
 ### 4.3 Script SQL - Executar NO ORACLE
 
 O arquivo `database_schema.sql` já contém:
@@ -398,7 +400,7 @@ Quando executar o sistema, você verá:
 
 | Método | Endpoint | Descrição | Status HTTP |
 |--------|----------|-----------|-------------|
-| GET | `/consultas` | Lista todas as consultas | 200 OK |
+| GET | `/consultas` | Lista todas as consultas AGENDADAS | 200 OK |
 | GET | `/consultas/{id}` | Busca consulta por ID | 200 OK / 404 |
 | POST | `/consultas` | Cria nova consulta | 201 Created / 400 / 422 |
 | PUT | `/consultas/{id}` | Atualiza consulta | 200 OK |
@@ -496,6 +498,7 @@ Todos os DAOs possuem:
 - `PacienteDAO`: `buscarPorNome(String nome)`
 - `MedicoDAO`: `buscarPorCrm(String crm)`, `listarPorEspecialidade(Long id)`
 - `ConsultaDAO`: `listarPorPaciente()`, `listarPorMedico()`, `listarPorStatus()`
+  - **Nota**: `listarTodos()` retorna apenas consultas com status "Agendada"
 - `LocalizacaoDAO`: `listarPorCidade(String cidade)`
 - `CancelamentoDAO`: `listarPorConsulta(Long id)`
 - `HistoricoMedicoDAO`: `listarPorPaciente(Long id)`
