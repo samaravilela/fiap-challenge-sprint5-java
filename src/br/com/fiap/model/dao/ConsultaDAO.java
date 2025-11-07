@@ -147,17 +147,37 @@ public class ConsultaDAO {
     
     /**
      * Deleta uma consulta pelo ID
+     * ATENÇÃO: Deleta também todos os registros relacionados (orientações e cancelamentos)
      * @param id ID da consulta
      * @return true se deletado com sucesso
      */
     public boolean deletar(Long id) {
-        String sql = "DELETE FROM T_EASEHC_CONSULTA WHERE ID_CONSULTA = ?";
+        Connection conn = null;
         
-        try (Connection conn = ConexaoBD.getConexao();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try {
+            conn = ConexaoBD.getConexao();
             
-            stmt.setLong(1, id);
-            int rowsAffected = stmt.executeUpdate();
+            // 1. Deletar orientações relacionadas
+            String sqlOrientacoes = "DELETE FROM T_EASEHC_ORIENTACAO WHERE ID_CONSULTA = ?";
+            try (PreparedStatement stmt = conn.prepareStatement(sqlOrientacoes)) {
+                stmt.setLong(1, id);
+                stmt.executeUpdate();
+            }
+            
+            // 2. Deletar cancelamentos/remarcações relacionadas
+            String sqlCancelamentos = "DELETE FROM T_EASEHC_CANREM WHERE ID_CONSULTA = ?";
+            try (PreparedStatement stmt = conn.prepareStatement(sqlCancelamentos)) {
+                stmt.setLong(1, id);
+                stmt.executeUpdate();
+            }
+            
+            // 3. Deletar a consulta
+            String sqlConsulta = "DELETE FROM T_EASEHC_CONSULTA WHERE ID_CONSULTA = ?";
+            int rowsAffected;
+            try (PreparedStatement stmt = conn.prepareStatement(sqlConsulta)) {
+                stmt.setLong(1, id);
+                rowsAffected = stmt.executeUpdate();
+            }
             
             if (rowsAffected > 0) {
                 conn.commit();
@@ -168,7 +188,18 @@ public class ConsultaDAO {
             
         } catch (SQLException e) {
             ConexaoBD.rollback();
-            throw new DatabaseException("Erro ao deletar consulta: " + e.getMessage(), e);
+            
+            // Mensagem de erro mais informativa
+            String mensagem = "Erro ao deletar consulta: ";
+            if (e.getMessage().contains("ORA-02292")) {
+                mensagem += "A consulta possui registros relacionados que impedem a exclusão.";
+            } else if (e.getMessage().contains("ORA-02291")) {
+                mensagem += "Consulta não encontrada ou dados relacionados inválidos.";
+            } else {
+                mensagem += e.getMessage();
+            }
+            
+            throw new DatabaseException(mensagem, e);
         }
     }
     

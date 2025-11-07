@@ -118,7 +118,7 @@ public class SistemaAgendamentoConsultas {
         System.out.println("║  1. CREATE - Criar Nova Consulta                     ║");
         System.out.println("║  2. READ   - Listar Todas as Consultas               ║");
         System.out.println("║  3. READ   - Buscar Consulta por ID                  ║");
-        System.out.println("║  4. UPDATE - Atualizar Consulta                      ║");
+        System.out.println("║  4. UPDATE - Reagendar Consulta (Data/Hora)          ║");
         System.out.println("║  5. DELETE - Cancelar/Deletar Consulta               ║");
         System.out.println("║  0. Voltar ao Menu Principal                         ║");
         System.out.println("╚══════════════════════════════════════════════════════╝");
@@ -211,19 +211,41 @@ public class SistemaAgendamentoConsultas {
         System.out.print("\nDigite o ID da localização: ");
         long idLocalizacao = lerLong();
 
-        System.out.print("Digite a data e hora (formato: dd/MM/yyyy HH:mm): ");
+        // Leitura da data/hora com validação
+        System.out.println("\nData e hora da consulta:");
+        System.out.println("  Formato: dd/MM/yyyy HH:mm");
+        System.out.println("  Exemplo: 15/12/2025 14:30");
         scanner.nextLine(); // Limpar buffer
-        String dataStr = scanner.nextLine();
         
-        LocalDateTime dataHora;
-        try {
-            dataHora = LocalDateTime.parse(dataStr, dateTimeFormatter);
-        } catch (DateTimeParseException e) {
-            System.out.println("✗ Formato de data inválido!");
+        LocalDateTime dataHora = null;
+        int tentativas = 0;
+        while (dataHora == null && tentativas < 3) {
+            System.out.print("Digite a data e hora: ");
+            String dataStr = scanner.nextLine().trim();
+            
+            try {
+                dataHora = LocalDateTime.parse(dataStr, dateTimeFormatter);
+                
+                // Validar se a data é razoável (não muito no passado)
+                if (dataHora.isBefore(LocalDateTime.now().minusDays(7))) {
+                    System.out.println("✗ Data muito antiga! Consultas devem ser recentes ou futuras.");
+                    dataHora = null;
+                }
+            } catch (DateTimeParseException e) {
+                tentativas++;
+                System.out.println("✗ Formato inválido! Use dd/MM/yyyy HH:mm (exemplo: 15/12/2025 14:30)");
+                if (tentativas < 3) {
+                    System.out.println("  Tente novamente (" + (3 - tentativas) + " tentativa(s) restante(s))");
+                }
+            }
+        }
+        
+        if (dataHora == null) {
+            System.out.println("\n✗ Não foi possível criar a consulta. Data/hora inválida.");
             return;
         }
 
-        System.out.print("Digite a duração em minutos: ");
+        System.out.print("\nDigite a duração em minutos: ");
         int duracao = lerInteiro();
 
         System.out.print("Digite o status (Agendada/Cancelada/Realizada): ");
@@ -284,10 +306,10 @@ public class SistemaAgendamentoConsultas {
         }
     }
 
-    // UPDATE - Atualizar consulta
+    // UPDATE - Atualizar consulta (apenas data e hora)
     private static void atualizarConsulta() {
-        System.out.println("\n───────────── UPDATE: ATUALIZAR CONSULTA ─────────────");
-        System.out.print("Digite o ID da consulta que deseja atualizar: ");
+        System.out.println("\n───────────── UPDATE: REAGENDAR CONSULTA ─────────────");
+        System.out.print("Digite o ID da consulta que deseja reagendar: ");
         long id = lerLong();
 
         Consulta consultaExistente = consultaDAO.buscarPorId(id);
@@ -296,37 +318,60 @@ public class SistemaAgendamentoConsultas {
             return;
         }
 
-        System.out.println("\nConsulta atual:");
-        System.out.println(consultaExistente);
+        System.out.println("\n✓ Consulta encontrada:");
+        System.out.println("  ID: " + consultaExistente.getIdConsulta());
+        System.out.println("  Paciente ID: " + consultaExistente.getIdPaciente());
+        System.out.println("  Médico ID: " + consultaExistente.getIdMedico());
+        System.out.println("  Data/Hora atual: " + consultaExistente.getDataHora().format(dateTimeFormatter));
+        System.out.println("  Status: " + consultaExistente.getStatus());
+        System.out.println("  Observações: " + consultaExistente.getObservacoes());
 
-        System.out.println("\n--- Digite os novos dados (ou pressione Enter para manter o atual) ---");
-        scanner.nextLine(); // Limpar buffer
-
-        System.out.print("Nova data e hora (formato: dd/MM/yyyy HH:mm) [" + 
-            consultaExistente.getDataHora().format(dateTimeFormatter) + "]: ");
-        String dataStr = scanner.nextLine();
+        // Leitura da nova data/hora com validação
+        System.out.println("\n──────── NOVA DATA E HORA ────────");
+        System.out.println("  Formato: dd/MM/yyyy HH:mm");
+        System.out.println("  Exemplo: 15/12/2025 14:30");
         
-        LocalDateTime novaDataHora = consultaExistente.getDataHora();
-        if (!dataStr.trim().isEmpty()) {
+        scanner.nextLine(); // Limpar buffer
+        
+        LocalDateTime novaDataHora = null;
+        int tentativas = 0;
+        
+        while (novaDataHora == null && tentativas < 3) {
+            System.out.print("\nDigite a nova data e hora: ");
+            String dataStr = scanner.nextLine().trim();
+            
+            if (dataStr.isEmpty()) {
+                System.out.println("✗ Data/hora não pode estar vazia!");
+                tentativas++;
+                if (tentativas < 3) {
+                    System.out.println("  Tente novamente (" + (3 - tentativas) + " tentativa(s) restante(s))");
+                }
+                continue;
+            }
+            
             try {
                 novaDataHora = LocalDateTime.parse(dataStr, dateTimeFormatter);
+                
+                // Validar se a data é razoável
+                if (novaDataHora.isBefore(LocalDateTime.now().minusDays(7))) {
+                    System.out.println("✗ Data muito antiga! Consultas devem ser recentes ou futuras.");
+                    novaDataHora = null;
+                }
             } catch (DateTimeParseException e) {
-                System.out.println("✗ Formato de data inválido! Mantendo data anterior.");
+                tentativas++;
+                System.out.println("✗ Formato inválido! Use dd/MM/yyyy HH:mm (exemplo: 15/12/2025 14:30)");
+                if (tentativas < 3) {
+                    System.out.println("  Tente novamente (" + (3 - tentativas) + " tentativa(s) restante(s))");
+                }
             }
         }
-
-        System.out.print("Novo status [" + consultaExistente.getStatus() + "]: ");
-        String novoStatus = scanner.nextLine();
-        if (novoStatus.trim().isEmpty()) {
-            novoStatus = consultaExistente.getStatus();
+        
+        if (novaDataHora == null) {
+            System.out.println("\n✗ Não foi possível atualizar a consulta. Data/hora inválida.");
+            return;
         }
 
-        System.out.print("Novas observações [" + consultaExistente.getObservacoes() + "]: ");
-        String novasObs = scanner.nextLine();
-        if (novasObs.trim().isEmpty()) {
-            novasObs = consultaExistente.getObservacoes();
-        }
-
+        // Criar consulta atualizada mantendo todos os outros dados
         Consulta consultaAtualizada = new Consulta(
             id,
             consultaExistente.getIdPaciente(),
@@ -335,14 +380,17 @@ public class SistemaAgendamentoConsultas {
             consultaExistente.getIdEspecialidade(),
             novaDataHora,
             consultaExistente.getDuracaoMinutos(),
-            novoStatus,
-            novasObs,
+            consultaExistente.getStatus(),
+            consultaExistente.getObservacoes(),
             consultaExistente.getPrioridade()
         );
 
         try {
             if (consultaDAO.atualizar(consultaAtualizada)) {
-                System.out.println("\n✓ Consulta atualizada com sucesso!");
+                System.out.println("\n✓ Consulta reagendada com sucesso!");
+                System.out.println("  Nova data/hora: " + novaDataHora.format(dateTimeFormatter));
+            } else {
+                System.out.println("\n✗ Consulta não foi atualizada.");
             }
         } catch (Exception e) {
             System.out.println("\n✗ Erro ao atualizar consulta: " + e.getMessage());
@@ -364,13 +412,14 @@ public class SistemaAgendamentoConsultas {
         System.out.println("\nConsulta a ser deletada:");
         System.out.println(consulta);
         System.out.print("\nTem certeza que deseja deletar? (S/N): ");
-        scanner.nextLine(); // Limpar buffer
-        String confirmacao = scanner.nextLine();
+        String confirmacao = scanner.nextLine().trim();
 
         if (confirmacao.equalsIgnoreCase("S")) {
             try {
                 if (consultaDAO.deletar(id)) {
                     System.out.println("\n✓ Consulta deletada com sucesso!");
+                } else {
+                    System.out.println("\n✗ Consulta não foi deletada (pode não existir mais).");
                 }
             } catch (Exception e) {
                 System.out.println("\n✗ Erro ao deletar consulta: " + e.getMessage());
@@ -461,17 +510,43 @@ public class SistemaAgendamentoConsultas {
         System.out.print("Nome completo: ");
         String nome = scanner.nextLine();
 
-        System.out.print("Data de nascimento (dd/MM/yyyy): ");
-        String dataNascStr = scanner.nextLine();
-        LocalDate dataNasc;
-        try {
-            dataNasc = LocalDate.parse(dataNascStr, dateFormatter);
-        } catch (DateTimeParseException e) {
-            System.out.println("✗ Formato de data inválido!");
+        // Leitura da data com validação e nova tentativa
+        System.out.println("\nData de nascimento:");
+        System.out.println("  Formato: dd/MM/yyyy");
+        System.out.println("  Exemplo: 15/03/1990");
+        
+        LocalDate dataNasc = null;
+        int tentativas = 0;
+        while (dataNasc == null && tentativas < 3) {
+            System.out.print("Digite a data: ");
+            String dataNascStr = scanner.nextLine().trim();
+            
+            try {
+                dataNasc = LocalDate.parse(dataNascStr, dateFormatter);
+                
+                // Validar se a data é razoável (não futura, não muito antiga)
+                if (dataNasc.isAfter(LocalDate.now())) {
+                    System.out.println("✗ Data não pode ser no futuro!");
+                    dataNasc = null;
+                } else if (dataNasc.isBefore(LocalDate.now().minusYears(120))) {
+                    System.out.println("✗ Data muito antiga! Verifique o ano.");
+                    dataNasc = null;
+                }
+            } catch (DateTimeParseException e) {
+                tentativas++;
+                System.out.println("✗ Formato inválido! Use dd/MM/yyyy (exemplo: 15/03/1990)");
+                if (tentativas < 3) {
+                    System.out.println("  Tente novamente (" + (3 - tentativas) + " tentativa(s) restante(s))");
+                }
+            }
+        }
+        
+        if (dataNasc == null) {
+            System.out.println("\n✗ Não foi possível cadastrar. Data de nascimento inválida.");
             return;
         }
 
-        System.out.print("Gênero (F/M/O): ");
+        System.out.print("\nGênero (F/M/O): ");
         String genero = scanner.nextLine();
 
         System.out.print("Telefone: ");
@@ -480,7 +555,7 @@ public class SistemaAgendamentoConsultas {
         System.out.print("Tipo sanguíneo (A+, A-, B+, B-, AB+, AB-, O+, O-): ");
         String tipoSanguineo = scanner.nextLine();
 
-        System.out.print("Alergias: ");
+        System.out.print("Alergias (ou pressione Enter se não houver): ");
         String alergias = scanner.nextLine();
 
         Paciente paciente = new Paciente(
