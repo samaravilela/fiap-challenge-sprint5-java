@@ -52,8 +52,8 @@ public class ConsultaService {
     }
     
     /**
-     * Lista todas as consultas
-     * @return Lista de consultas
+     * Lista todas as consultas agendadas
+     * @return Lista de consultas com status "Agendada"
      */
     public List<Consulta> listarTodos() {
         return consultaDAO.listarTodos();

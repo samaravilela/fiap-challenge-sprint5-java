@@ -13,7 +13,7 @@ import java.util.List;
  * Seguindo princípios RESTful
  * 
  * Endpoints:
- * GET    /consultas              - Lista todas as consultas
+ * GET    /consultas              - Lista todas as consultas agendadas
  * GET    /consultas/{id}         - Busca consulta por ID
  * POST   /consultas              - Cria nova consulta
  * PUT    /consultas/{id}         - Atualiza consulta
@@ -32,7 +32,7 @@ public class ConsultaResource {
     }
     
     /**
-     * GET /consultas - Lista todas as consultas
+     * GET /consultas - Lista todas as consultas agendadas
      */
     public ResponseEntity<List<Consulta>> listarTodos() {
         try {

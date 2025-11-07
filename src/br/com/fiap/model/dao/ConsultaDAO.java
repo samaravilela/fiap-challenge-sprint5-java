@@ -82,14 +82,14 @@ public class ConsultaDAO {
     }
     
     /**
-     * Lista todas as consultas
-     * @return Lista de consultas
+     * Lista todas as consultas agendadas
+     * @return Lista de consultas com status "Agendada"
      */
     public List<Consulta> listarTodos() {
         List<Consulta> consultas = new ArrayList<>();
         String sql = "SELECT ID_CONSULTA, ID_PACIENTE, ID_MEDICO, ID_LOCAL, ID_ESP, DT_HORA, " +
                      "DUR_MINUTOS, STATUS, OBSERVACOES, PRIORIDADE " +
-                     "FROM T_EASEHC_CONSULTA ORDER BY DT_HORA DESC";
+                     "FROM T_EASEHC_CONSULTA WHERE STATUS = 'Agendada' ORDER BY DT_HORA DESC";
         
         try (Connection conn = ConexaoBD.getConexao();
              Statement stmt = conn.createStatement();
