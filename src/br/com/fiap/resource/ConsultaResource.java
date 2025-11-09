@@ -6,6 +6,9 @@ import br.com.fiap.exception.ValidationException;
 import br.com.fiap.model.dto.Consulta;
 import br.com.fiap.service.ConsultaService;
 
+import javax.ws.rs.*;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import java.util.List;
 
 /**
@@ -23,6 +26,9 @@ import java.util.List;
  * GET    /consultas/status/{status} - Lista consultas por status
  * PUT    /consultas/{id}/cancelar - Cancela consulta
  */
+@Path("/consultas")
+@Produces(MediaType.APPLICATION_JSON)
+@Consumes(MediaType.APPLICATION_JSON)
 public class ConsultaResource {
     
     private final ConsultaService consultaService;
@@ -34,131 +40,168 @@ public class ConsultaResource {
     /**
      * GET /consultas - Lista todas as consultas agendadas
      */
-    public ResponseEntity<List<Consulta>> listarTodos() {
+    @GET
+    public Response listarTodos() {
         try {
             List<Consulta> consultas = consultaService.listarTodos();
-            return new ResponseEntity<>(consultas, 200);
+            return Response.ok(consultas).build();
         } catch (Exception e) {
-            return new ResponseEntity<>(null, 500, "Erro interno: " + e.getMessage());
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity("Erro interno: " + e.getMessage()).build();
         }
     }
     
     /**
      * GET /consultas/{id} - Busca consulta por ID
      */
-    public ResponseEntity<Consulta> buscarPorId(Long id) {
+    @GET
+    @Path("/{id}")
+    public Response buscarPorId(@PathParam("id") Long id) {
         try {
             Consulta consulta = consultaService.buscarPorId(id);
-            return new ResponseEntity<>(consulta, 200);
+            return Response.ok(consulta).build();
         } catch (ResourceNotFoundException e) {
-            return new ResponseEntity<>(null, 404, e.getMessage());
+            return Response.status(Response.Status.NOT_FOUND)
+                    .entity(e.getMessage()).build();
         } catch (Exception e) {
-            return new ResponseEntity<>(null, 500, "Erro interno: " + e.getMessage());
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity("Erro interno: " + e.getMessage()).build();
         }
     }
     
     /**
      * POST /consultas - Cria nova consulta
      */
-    public ResponseEntity<Consulta> criar(Consulta consulta) {
+    @POST
+    public Response criar(Consulta consulta) {
         try {
             Consulta consultaCriada = consultaService.criar(consulta);
-            return new ResponseEntity<>(consultaCriada, 201);
+            return Response.status(Response.Status.CREATED).entity(consultaCriada).build();
         } catch (ValidationException e) {
-            return new ResponseEntity<>(null, 400, e.getMessage());
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity(e.getMessage()).build();
         } catch (BusinessRuleException e) {
-            return new ResponseEntity<>(null, 422, e.getMessage());
+            return Response.status(422)
+                    .entity(e.getMessage()).build();
         } catch (Exception e) {
-            return new ResponseEntity<>(null, 500, "Erro interno: " + e.getMessage());
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity("Erro interno: " + e.getMessage()).build();
         }
     }
     
     /**
      * PUT /consultas/{id} - Atualiza consulta
      */
-    public ResponseEntity<Consulta> atualizar(Long id, Consulta consulta) {
+    @PUT
+    @Path("/{id}")
+    public Response atualizar(@PathParam("id") Long id, Consulta consulta) {
         try {
             consulta.setIdConsulta(id);
             consultaService.atualizar(consulta);
-            return new ResponseEntity<>(consulta, 200);
+            return Response.ok(consulta).build();
         } catch (ResourceNotFoundException e) {
-            return new ResponseEntity<>(null, 404, e.getMessage());
+            return Response.status(Response.Status.NOT_FOUND)
+                    .entity(e.getMessage()).build();
         } catch (ValidationException e) {
-            return new ResponseEntity<>(null, 400, e.getMessage());
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity(e.getMessage()).build();
         } catch (Exception e) {
-            return new ResponseEntity<>(null, 500, "Erro interno: " + e.getMessage());
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity("Erro interno: " + e.getMessage()).build();
         }
     }
     
     /**
      * DELETE /consultas/{id} - Deleta consulta
      */
-    public ResponseEntity<Void> deletar(Long id) {
+    @DELETE
+    @Path("/{id}")
+    public Response deletar(@PathParam("id") Long id) {
         try {
             consultaService.deletar(id);
-            return new ResponseEntity<>(null, 204);
+            return Response.noContent().build();
         } catch (ResourceNotFoundException e) {
-            return new ResponseEntity<>(null, 404, e.getMessage());
+            return Response.status(Response.Status.NOT_FOUND)
+                    .entity(e.getMessage()).build();
         } catch (Exception e) {
-            return new ResponseEntity<>(null, 500, "Erro interno: " + e.getMessage());
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity("Erro interno: " + e.getMessage()).build();
         }
     }
     
     /**
      * GET /consultas/paciente/{id} - Lista consultas do paciente
      */
-    public ResponseEntity<List<Consulta>> listarPorPaciente(Long idPaciente) {
+    @GET
+    @Path("/paciente/{id}")
+    public Response listarPorPaciente(@PathParam("id") Long idPaciente) {
         try {
             List<Consulta> consultas = consultaService.listarPorPaciente(idPaciente);
-            return new ResponseEntity<>(consultas, 200);
+            return Response.ok(consultas).build();
         } catch (ValidationException e) {
-            return new ResponseEntity<>(null, 400, e.getMessage());
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity(e.getMessage()).build();
         } catch (Exception e) {
-            return new ResponseEntity<>(null, 500, "Erro interno: " + e.getMessage());
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity("Erro interno: " + e.getMessage()).build();
         }
     }
     
     /**
      * GET /consultas/medico/{id} - Lista consultas do médico
      */
-    public ResponseEntity<List<Consulta>> listarPorMedico(Long idMedico) {
+    @GET
+    @Path("/medico/{id}")
+    public Response listarPorMedico(@PathParam("id") Long idMedico) {
         try {
             List<Consulta> consultas = consultaService.listarPorMedico(idMedico);
-            return new ResponseEntity<>(consultas, 200);
+            return Response.ok(consultas).build();
         } catch (ValidationException e) {
-            return new ResponseEntity<>(null, 400, e.getMessage());
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity(e.getMessage()).build();
         } catch (Exception e) {
-            return new ResponseEntity<>(null, 500, "Erro interno: " + e.getMessage());
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity("Erro interno: " + e.getMessage()).build();
         }
     }
     
     /**
      * GET /consultas/status/{status} - Lista consultas por status
      */
-    public ResponseEntity<List<Consulta>> listarPorStatus(String status) {
+    @GET
+    @Path("/status/{status}")
+    public Response listarPorStatus(@PathParam("status") String status) {
         try {
             List<Consulta> consultas = consultaService.listarPorStatus(status);
-            return new ResponseEntity<>(consultas, 200);
+            return Response.ok(consultas).build();
         } catch (ValidationException e) {
-            return new ResponseEntity<>(null, 400, e.getMessage());
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity(e.getMessage()).build();
         } catch (Exception e) {
-            return new ResponseEntity<>(null, 500, "Erro interno: " + e.getMessage());
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity("Erro interno: " + e.getMessage()).build();
         }
     }
     
     /**
      * PUT /consultas/{id}/cancelar - Cancela consulta
      */
-    public ResponseEntity<Void> cancelar(Long id, String motivo) {
+    @PUT
+    @Path("/{id}/cancelar")
+    @Consumes(MediaType.TEXT_PLAIN)
+    public Response cancelar(@PathParam("id") Long id, String motivo) {
         try {
             consultaService.cancelar(id, motivo);
-            return new ResponseEntity<>(null, 200, "Consulta cancelada com sucesso");
+            return Response.ok("Consulta cancelada com sucesso").build();
         } catch (ResourceNotFoundException e) {
-            return new ResponseEntity<>(null, 404, e.getMessage());
+            return Response.status(Response.Status.NOT_FOUND)
+                    .entity(e.getMessage()).build();
         } catch (BusinessRuleException e) {
-            return new ResponseEntity<>(null, 422, e.getMessage());
+            return Response.status(422)
+                    .entity(e.getMessage()).build();
         } catch (Exception e) {
-            return new ResponseEntity<>(null, 500, "Erro interno: " + e.getMessage());
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity("Erro interno: " + e.getMessage()).build();
         }
     }
 }

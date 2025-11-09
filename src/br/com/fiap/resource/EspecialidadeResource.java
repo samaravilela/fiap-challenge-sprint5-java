@@ -5,6 +5,9 @@ import br.com.fiap.exception.ValidationException;
 import br.com.fiap.model.dto.Especialidade;
 import br.com.fiap.service.EspecialidadeService;
 
+import javax.ws.rs.*;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import java.util.List;
 
 /**
@@ -18,6 +21,9 @@ import java.util.List;
  * PUT    /especialidades/{id}  - Atualiza especialidade
  * DELETE /especialidades/{id}  - Deleta especialidade
  */
+@Path("/especialidades")
+@Produces(MediaType.APPLICATION_JSON)
+@Consumes(MediaType.APPLICATION_JSON)
 public class EspecialidadeResource {
     
     private final EspecialidadeService especialidadeService;
@@ -29,71 +35,89 @@ public class EspecialidadeResource {
     /**
      * GET /especialidades - Lista todas as especialidades
      */
-    public ResponseEntity<List<Especialidade>> listarTodos() {
+    @GET
+    public Response listarTodos() {
         try {
             List<Especialidade> especialidades = especialidadeService.listarTodos();
-            return new ResponseEntity<>(especialidades, 200);
+            return Response.ok(especialidades).build();
         } catch (Exception e) {
-            return new ResponseEntity<>(null, 500, "Erro interno: " + e.getMessage());
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity("Erro interno: " + e.getMessage()).build();
         }
     }
     
     /**
      * GET /especialidades/{id} - Busca especialidade por ID
      */
-    public ResponseEntity<Especialidade> buscarPorId(Long id) {
+    @GET
+    @Path("/{id}")
+    public Response buscarPorId(@PathParam("id") Long id) {
         try {
             Especialidade especialidade = especialidadeService.buscarPorId(id);
-            return new ResponseEntity<>(especialidade, 200);
+            return Response.ok(especialidade).build();
         } catch (ResourceNotFoundException e) {
-            return new ResponseEntity<>(null, 404, e.getMessage());
+            return Response.status(Response.Status.NOT_FOUND)
+                    .entity(e.getMessage()).build();
         } catch (Exception e) {
-            return new ResponseEntity<>(null, 500, "Erro interno: " + e.getMessage());
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity("Erro interno: " + e.getMessage()).build();
         }
     }
     
     /**
      * POST /especialidades - Cria nova especialidade
      */
-    public ResponseEntity<Especialidade> criar(Especialidade especialidade) {
+    @POST
+    public Response criar(Especialidade especialidade) {
         try {
             Especialidade especialidadeCriada = especialidadeService.criar(especialidade);
-            return new ResponseEntity<>(especialidadeCriada, 201);
+            return Response.status(Response.Status.CREATED).entity(especialidadeCriada).build();
         } catch (ValidationException e) {
-            return new ResponseEntity<>(null, 400, e.getMessage());
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity(e.getMessage()).build();
         } catch (Exception e) {
-            return new ResponseEntity<>(null, 500, "Erro interno: " + e.getMessage());
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity("Erro interno: " + e.getMessage()).build();
         }
     }
     
     /**
      * PUT /especialidades/{id} - Atualiza especialidade
      */
-    public ResponseEntity<Especialidade> atualizar(Long id, Especialidade especialidade) {
+    @PUT
+    @Path("/{id}")
+    public Response atualizar(@PathParam("id") Long id, Especialidade especialidade) {
         try {
             especialidade.setIdEspecialidade(id);
             especialidadeService.atualizar(especialidade);
-            return new ResponseEntity<>(especialidade, 200);
+            return Response.ok(especialidade).build();
         } catch (ResourceNotFoundException e) {
-            return new ResponseEntity<>(null, 404, e.getMessage());
+            return Response.status(Response.Status.NOT_FOUND)
+                    .entity(e.getMessage()).build();
         } catch (ValidationException e) {
-            return new ResponseEntity<>(null, 400, e.getMessage());
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity(e.getMessage()).build();
         } catch (Exception e) {
-            return new ResponseEntity<>(null, 500, "Erro interno: " + e.getMessage());
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity("Erro interno: " + e.getMessage()).build();
         }
     }
     
     /**
      * DELETE /especialidades/{id} - Deleta especialidade
      */
-    public ResponseEntity<Void> deletar(Long id) {
+    @DELETE
+    @Path("/{id}")
+    public Response deletar(@PathParam("id") Long id) {
         try {
             especialidadeService.deletar(id);
-            return new ResponseEntity<>(null, 204);
+            return Response.noContent().build();
         } catch (ResourceNotFoundException e) {
-            return new ResponseEntity<>(null, 404, e.getMessage());
+            return Response.status(Response.Status.NOT_FOUND)
+                    .entity(e.getMessage()).build();
         } catch (Exception e) {
-            return new ResponseEntity<>(null, 500, "Erro interno: " + e.getMessage());
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity("Erro interno: " + e.getMessage()).build();
         }
     }
 }

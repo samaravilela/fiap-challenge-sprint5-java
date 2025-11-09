@@ -5,6 +5,9 @@ import br.com.fiap.exception.ValidationException;
 import br.com.fiap.model.dto.Paciente;
 import br.com.fiap.service.PacienteService;
 
+import javax.ws.rs.*;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import java.util.List;
 
 /**
@@ -17,7 +20,11 @@ import java.util.List;
  * POST   /pacientes       - Cria novo paciente
  * PUT    /pacientes/{id}  - Atualiza paciente
  * DELETE /pacientes/{id}  - Deleta paciente
+ * GET    /pacientes/buscar?nome={nome} - Busca pacientes por nome
  */
+@Path("/pacientes")
+@Produces(MediaType.APPLICATION_JSON)
+@Consumes(MediaType.APPLICATION_JSON)
 public class PacienteResource {
     
     private final PacienteService pacienteService;
@@ -28,98 +35,108 @@ public class PacienteResource {
     
     /**
      * GET /pacientes - Lista todos os pacientes
-     * @return Lista de pacientes (200 OK)
      */
-    public ResponseEntity<List<Paciente>> listarTodos() {
+    @GET
+    public Response listarTodos() {
         try {
             List<Paciente> pacientes = pacienteService.listarTodos();
-            return new ResponseEntity<>(pacientes, 200);
+            return Response.ok(pacientes).build();
         } catch (Exception e) {
-            return new ResponseEntity<>(null, 500, "Erro interno: " + e.getMessage());
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity("Erro interno: " + e.getMessage()).build();
         }
     }
     
     /**
      * GET /pacientes/{id} - Busca paciente por ID
-     * @param id ID do paciente
-     * @return Paciente encontrado (200 OK) ou 404 Not Found
      */
-    public ResponseEntity<Paciente> buscarPorId(Long id) {
+    @GET
+    @Path("/{id}")
+    public Response buscarPorId(@PathParam("id") Long id) {
         try {
             Paciente paciente = pacienteService.buscarPorId(id);
-            return new ResponseEntity<>(paciente, 200);
+            return Response.ok(paciente).build();
         } catch (ResourceNotFoundException e) {
-            return new ResponseEntity<>(null, 404, e.getMessage());
+            return Response.status(Response.Status.NOT_FOUND)
+                    .entity(e.getMessage()).build();
         } catch (Exception e) {
-            return new ResponseEntity<>(null, 500, "Erro interno: " + e.getMessage());
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity("Erro interno: " + e.getMessage()).build();
         }
     }
     
     /**
      * POST /pacientes - Cria novo paciente
-     * @param paciente dados do paciente
-     * @return Paciente criado (201 Created) ou 400 Bad Request
      */
-    public ResponseEntity<Paciente> criar(Paciente paciente) {
+    @POST
+    public Response criar(Paciente paciente) {
         try {
             Paciente pacienteCriado = pacienteService.criar(paciente);
-            return new ResponseEntity<>(pacienteCriado, 201);
+            return Response.status(Response.Status.CREATED).entity(pacienteCriado).build();
         } catch (ValidationException e) {
-            return new ResponseEntity<>(null, 400, e.getMessage());
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity(e.getMessage()).build();
         } catch (Exception e) {
-            return new ResponseEntity<>(null, 500, "Erro interno: " + e.getMessage());
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity("Erro interno: " + e.getMessage()).build();
         }
     }
     
     /**
      * PUT /pacientes/{id} - Atualiza paciente
-     * @param id ID do paciente
-     * @param paciente dados atualizados
-     * @return 200 OK ou 404 Not Found ou 400 Bad Request
      */
-    public ResponseEntity<Paciente> atualizar(Long id, Paciente paciente) {
+    @PUT
+    @Path("/{id}")
+    public Response atualizar(@PathParam("id") Long id, Paciente paciente) {
         try {
             paciente.setIdPaciente(id);
             pacienteService.atualizar(paciente);
-            return new ResponseEntity<>(paciente, 200);
+            return Response.ok(paciente).build();
         } catch (ResourceNotFoundException e) {
-            return new ResponseEntity<>(null, 404, e.getMessage());
+            return Response.status(Response.Status.NOT_FOUND)
+                    .entity(e.getMessage()).build();
         } catch (ValidationException e) {
-            return new ResponseEntity<>(null, 400, e.getMessage());
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity(e.getMessage()).build();
         } catch (Exception e) {
-            return new ResponseEntity<>(null, 500, "Erro interno: " + e.getMessage());
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity("Erro interno: " + e.getMessage()).build();
         }
     }
     
     /**
      * DELETE /pacientes/{id} - Deleta paciente
-     * @param id ID do paciente
-     * @return 204 No Content ou 404 Not Found
      */
-    public ResponseEntity<Void> deletar(Long id) {
+    @DELETE
+    @Path("/{id}")
+    public Response deletar(@PathParam("id") Long id) {
         try {
             pacienteService.deletar(id);
-            return new ResponseEntity<>(null, 204);
+            return Response.noContent().build();
         } catch (ResourceNotFoundException e) {
-            return new ResponseEntity<>(null, 404, e.getMessage());
+            return Response.status(Response.Status.NOT_FOUND)
+                    .entity(e.getMessage()).build();
         } catch (Exception e) {
-            return new ResponseEntity<>(null, 500, "Erro interno: " + e.getMessage());
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity("Erro interno: " + e.getMessage()).build();
         }
     }
     
     /**
      * GET /pacientes/buscar?nome={nome} - Busca pacientes por nome
-     * @param nome nome ou parte do nome
-     * @return Lista de pacientes encontrados
      */
-    public ResponseEntity<List<Paciente>> buscarPorNome(String nome) {
+    @GET
+    @Path("/buscar")
+    public Response buscarPorNome(@QueryParam("nome") String nome) {
         try {
             List<Paciente> pacientes = pacienteService.buscarPorNome(nome);
-            return new ResponseEntity<>(pacientes, 200);
+            return Response.ok(pacientes).build();
         } catch (ValidationException e) {
-            return new ResponseEntity<>(null, 400, e.getMessage());
+            return Response.status(Response.Status.BAD_REQUEST)
+                    .entity(e.getMessage()).build();
         } catch (Exception e) {
-            return new ResponseEntity<>(null, 500, "Erro interno: " + e.getMessage());
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+                    .entity("Erro interno: " + e.getMessage()).build();
         }
     }
 }

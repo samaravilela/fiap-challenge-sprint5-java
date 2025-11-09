@@ -1,5 +1,5 @@
 # 🏥 EASEHC - SISTEMA DE GESTÃO DE CONSULTAS MÉDICAS
-## GUIA COMPLETO DO PROJETO - SPRINT 4
+## GUIA COMPLETO DO PROJETO - SPRINT 5
 
 **Grupo:**
 - Samara Vilela de Oliveira - RM 566133
@@ -19,11 +19,13 @@
 3. [Estrutura do Projeto](#estrutura)
 4. [Configuração do Banco de Dados](#banco-de-dados)
 5. [Compilação e Execução](#compilação)
-6. [API RESTful - Endpoints](#api-restful)
-7. [Funcionalidades Implementadas](#funcionalidades)
-8. [Troubleshooting](#troubleshooting)
-9. [Tecnologias e Padrões](#tecnologias)
-10. [Checklist Final](#checklist)
+6. [API RESTful - Execução e Testes](#api-restful)
+7. [API RESTful - Endpoints Detalhados](#api-endpoints)
+8. [Testando a API no Postman](#testando-postman)
+9. [Funcionalidades Implementadas](#funcionalidades)
+10. [Troubleshooting](#troubleshooting)
+11. [Tecnologias e Padrões](#tecnologias)
+12. [Checklist Final](#checklist)
 
 ---
 
@@ -39,7 +41,7 @@ Gerenciar pacientes, médicos, especialidades, localizações e consultas médic
 - ✅ **30+ classes Java** implementadas
 - ✅ **8 entidades** do banco de dados Oracle
 - ✅ **CRUD completo** em todas as entidades principais
-- ✅ **API RESTful** com 40+ endpoints
+- ✅ **API RESTful** com 33+ endpoints testáveis no Postman
 - ✅ **Validações robustas** em todas as camadas
 - ✅ **Regras de negócio** (conflito de horários, integridade referencial)
 - ✅ **Tratamento de exceções** personalizado
@@ -56,7 +58,7 @@ Gerenciar pacientes, médicos, especialidades, localizações e consultas médic
 |----------|----------------|----------------|----------|
 | **Camada Model (DTOs)** | 10 | 10 | 8 classes completas alinhadas com BD |
 | **Camada DAO e Service** | 30 | 30 | CRUD + Validações + Regras de negócio |
-| **API RESTful** | 30 | 30 | 40+ endpoints seguindo REST |
+| **API RESTful** | 30 | 30 | 33+ endpoints seguindo REST, testável no Postman |
 | **Boas Práticas** | 20 | 20 | Padrões + Exceções + Documentação |
 | **TOTAL** | **90** | **90** | **100%** ✅ |
 
@@ -97,13 +99,15 @@ Sprint4/
 │   │   ├── EspecialidadeService.java ✅ Validações completas
 │   │   └── LocalizacaoService.java   ✅ Validações completas
 │   │
-│   ├── resource/                   # 6 Resources (API REST)
+│   ├── resource/                   # 5 Resources (API REST)
 │   │   ├── PacienteResource.java  ✅ 6 endpoints
 │   │   ├── MedicoResource.java    ✅ 7 endpoints
 │   │   ├── ConsultaResource.java  ✅ 9 endpoints
 │   │   ├── EspecialidadeResource.java ✅ 5 endpoints
-│   │   ├── LocalizacaoResource.java   ✅ 6 endpoints
-│   │   └── ResponseEntity.java    ✅ Helper HTTP
+│   │   └── LocalizacaoResource.java   ✅ 6 endpoints
+│   │
+│   ├── config/                     # Configuração JAX-RS
+│   │   └── JaxRsApplication.java  ✅ Configuração da aplicação REST
 │   │
 │   ├── exception/                  # 4 Exceções personalizadas
 │   │   ├── DatabaseException.java      ✅ Erros de BD
@@ -113,6 +117,7 @@ Sprint4/
 │   │
 │   └── main/                       # Classes executáveis
 │       ├── SistemaAgendamentoConsultas.java ✅ Sistema console
+│       ├── ApiServer.java          ✅ Servidor REST embutido (Jetty)
 │       └── TesteSimples.java       ✅ Teste rápido
 │
 ├── lib/
@@ -322,9 +327,75 @@ java -cp "out/production/Sprint4:lib/ojdbc8.jar" \
 ╚════════════════════════════════════════════╝
 ```
 
-### 5.6 Menu do Sistema Console
+### 5.6 Executar API REST (Servidor Embutido)
 
-Quando executar o sistema, você verá:
+**✅ SIM, você pode testar a API no Postman!**
+
+A API REST foi configurada com servidor embutido (Jetty) e está pronta para testes.
+
+#### Compilar e Executar o Servidor REST:
+
+```bash
+# Compilar o projeto
+mvn clean compile
+
+# Executar o servidor REST
+mvn exec:java -Dexec.mainClass="br.com.fiap.main.ApiServer"
+```
+
+**OU** compilar primeiro e depois executar:
+
+```bash
+# Compilar tudo
+mvn clean package
+
+# Executar servidor
+java -cp "target/classes:$(mvn dependency:build-classpath -q -Dmdep.outputFile=/dev/stdout)" br.com.fiap.main.ApiServer
+```
+
+#### Verificar se o Servidor Está Rodando:
+
+Você verá uma mensagem como esta:
+
+```
+╔═══════════════════════════════════════════════════════╗
+║   API REST - SISTEMA DE AGENDAMENTO DE CONSULTAS     ║
+║              Sprint 5 - FIAP                          ║
+╚═══════════════════════════════════════════════════════╝
+
+✓ Conexão com banco de dados estabelecida!
+═══════════════════════════════════════════════════════
+✓ Servidor iniciado com sucesso!
+═══════════════════════════════════════════════════════
+
+📍 URL Base: http://localhost:8080/api
+
+📋 Endpoints disponíveis:
+   GET    http://localhost:8080/api/consultas
+   GET    http://localhost:8080/api/pacientes
+   GET    http://localhost:8080/api/medicos
+   GET    http://localhost:8080/api/especialidades
+   GET    http://localhost:8080/api/localizacoes
+
+🔧 Teste a API no Postman:
+   1. Abra o Postman
+   2. Crie uma requisição GET para: http://localhost:8080/api/pacientes
+   3. Execute a requisição
+
+⚠️  Pressione Ctrl+C para parar o servidor
+═══════════════════════════════════════════════════════
+```
+
+**Porta padrão**: 8080
+
+Para alterar a porta, edite `src/br/com/fiap/main/ApiServer.java`:
+```java
+private static final int PORT = 8081; // ou outra porta
+```
+
+### 5.7 Menu do Sistema Console
+
+Quando executar o sistema console, você verá:
 
 ```
 ╔═══════════════════════════════════════════════════════╗
@@ -349,9 +420,86 @@ Quando executar o sistema, você verá:
 ---
 
 <a name="api-restful"></a>
-## 🌐 6. API RESTFUL - ENDPOINTS
+## 🌐 6. API RESTFUL - EXECUÇÃO E TESTES
 
-### 6.1 Pacientes (`/api/pacientes`)
+### 6.1 Como Executar a API REST
+
+A API REST foi configurada com **servidor embutido Jetty** e pode ser testada diretamente no **Postman** ou em qualquer cliente HTTP.
+
+#### Pré-requisitos:
+- ✅ Java 11+ instalado
+- ✅ Maven instalado
+- ✅ Postman instalado (ou qualquer cliente HTTP)
+- ✅ Conexão com banco de dados Oracle configurada
+
+#### Passo a Passo:
+
+1. **Compilar o Projeto:**
+```bash
+mvn clean compile
+```
+
+2. **Executar o Servidor:**
+```bash
+mvn exec:java -Dexec.mainClass="br.com.fiap.main.ApiServer"
+```
+
+3. **Verificar se o Servidor Está Rodando:**
+   - O servidor iniciará na porta **8080**
+   - URL Base: `http://localhost:8080/api`
+   - Você verá mensagens confirmando que o servidor está ativo
+
+4. **Testar no Postman:**
+   - Abra o Postman
+   - Crie uma requisição GET: `http://localhost:8080/api/pacientes`
+   - Clique em "Send"
+   - Você deve receber uma resposta JSON com a lista de pacientes
+
+### 6.2 Arquitetura da API REST
+
+A API REST foi implementada utilizando:
+- **JAX-RS (Jersey)** - Framework para APIs RESTful
+- **Jetty Embedded Server** - Servidor web embutido
+- **Jackson** - Serialização/deserialização JSON
+- **JavaTimeModule** - Suporte a LocalDate e LocalDateTime
+
+#### Estrutura:
+```
+┌─────────────────────────────────────────┐
+│   ApiServer.java (Main)                 │  ← Inicia servidor Jetty
+├─────────────────────────────────────────┤
+│   JaxRsApplication.java                 │  ← Configuração JAX-RS
+├─────────────────────────────────────────┤
+│   Resource Classes                      │  ← Endpoints REST
+│   - PacienteResource                    │
+│   - MedicoResource                      │
+│   - ConsultaResource                    │
+│   - EspecialidadeResource               │
+│   - LocalizacaoResource                 │
+├─────────────────────────────────────────┤
+│   Service Classes                       │  ← Regras de Negócio
+├─────────────────────────────────────────┤
+│   DAO Classes                           │  ← Acesso ao Banco
+└─────────────────────────────────────────┘
+```
+
+### 6.3 Base URL e Formato de Resposta
+
+**Base URL:** `http://localhost:8080/api`
+
+**Formato de Resposta:** JSON (application/json)
+
+**Content-Type:** `application/json` (para POST/PUT)
+
+**Formato de Data:** ISO 8601 (`YYYY-MM-DDTHH:mm:ss`)
+- Exemplo: `2025-12-15T14:30:00`
+
+---
+
+<a name="api-endpoints"></a>
+## 🔗 7. API RESTFUL - ENDPOINTS DETALHADOS
+
+### 7.1 Pacientes (`/api/pacientes`)
 
 | Método | Endpoint | Descrição | Status HTTP |
 |--------|----------|-----------|-------------|
@@ -374,7 +522,7 @@ Quando executar o sistema, você verá:
 }
 ```
 
-### 6.2 Médicos (`/api/medicos`)
+### 7.2 Médicos (`/api/medicos`)
 
 | Método | Endpoint | Descrição | Status HTTP |
 |--------|----------|-----------|-------------|
@@ -396,7 +544,7 @@ Quando executar o sistema, você verá:
 }
 ```
 
-### 6.3 Consultas (`/api/consultas`)
+### 7.3 Consultas (`/api/consultas`)
 
 | Método | Endpoint | Descrição | Status HTTP |
 |--------|----------|-----------|-------------|
@@ -425,7 +573,7 @@ Quando executar o sistema, você verá:
 }
 ```
 
-### 6.4 Especialidades (`/api/especialidades`)
+### 7.4 Especialidades (`/api/especialidades`)
 
 | Método | Endpoint | Descrição | Status HTTP |
 |--------|----------|-----------|-------------|
@@ -435,7 +583,7 @@ Quando executar o sistema, você verá:
 | PUT | `/especialidades/{id}` | Atualiza | 200 OK |
 | DELETE | `/especialidades/{id}` | Deleta | 204 No Content |
 
-### 6.5 Localizações (`/api/localizacoes`)
+### 7.5 Localizações (`/api/localizacoes`)
 
 | Método | Endpoint | Descrição | Status HTTP |
 |--------|----------|-----------|-------------|
@@ -446,7 +594,7 @@ Quando executar o sistema, você verá:
 | DELETE | `/localizacoes/{id}` | Deleta | 204 No Content |
 | GET | `/localizacoes/cidade/{cidade}` | Lista por cidade | 200 OK |
 
-### 6.6 Códigos de Status HTTP
+### 7.6 Códigos de Status HTTP
 
 | Código | Significado | Uso |
 |--------|-------------|-----|
@@ -460,10 +608,261 @@ Quando executar o sistema, você verá:
 
 ---
 
-<a name="funcionalidades"></a>
-## ✨ 7. FUNCIONALIDADES IMPLEMENTADAS
+<a name="testando-postman"></a>
+## 📮 8. TESTANDO A API NO POSTMAN
 
-### 7.1 Camada Model (10 pontos) ✅
+### 8.1 Exemplos de Requisições
+
+#### Exemplo 1: Listar Todos os Pacientes
+
+**Request:**
+- Método: `GET`
+- URL: `http://localhost:8080/api/pacientes`
+- Headers: (nenhum necessário)
+
+**Response esperado (200 OK):**
+```json
+[
+  {
+    "idPaciente": 1,
+    "nomeCompleto": "João Silva",
+    "dataNascimento": "1990-05-15",
+    "genero": "M",
+    "telefone": "(11) 99999-9999",
+    "tipoSanguineo": "O+",
+    "alergias": "Nenhuma"
+  },
+  {
+    "idPaciente": 2,
+    "nomeCompleto": "Maria Santos",
+    "dataNascimento": "1985-03-20",
+    "genero": "F",
+    "telefone": "(11) 88888-8888",
+    "tipoSanguineo": "A+",
+    "alergias": "Poeira"
+  }
+]
+```
+
+#### Exemplo 2: Criar um Novo Paciente
+
+**Request:**
+- Método: `POST`
+- URL: `http://localhost:8080/api/pacientes`
+- Headers:
+  - `Content-Type: application/json`
+- Body (raw JSON):
+```json
+{
+  "nomeCompleto": "Pedro Oliveira",
+  "dataNascimento": "1992-07-10",
+  "genero": "M",
+  "telefone": "(11) 77777-7777",
+  "tipoSanguineo": "B+",
+  "alergias": "Nenhuma"
+}
+```
+
+**Response esperado (201 Created):**
+```json
+{
+  "idPaciente": 3,
+  "nomeCompleto": "Pedro Oliveira",
+  "dataNascimento": "1992-07-10",
+  "genero": "M",
+  "telefone": "(11) 77777-7777",
+  "tipoSanguineo": "B+",
+  "alergias": "Nenhuma"
+}
+```
+
+#### Exemplo 3: Buscar Paciente por ID
+
+**Request:**
+- Método: `GET`
+- URL: `http://localhost:8080/api/pacientes/1`
+- Headers: (nenhum necessário)
+
+**Response esperado (200 OK):**
+```json
+{
+  "idPaciente": 1,
+  "nomeCompleto": "João Silva",
+  "dataNascimento": "1990-05-15",
+  "genero": "M",
+  "telefone": "(11) 99999-9999",
+  "tipoSanguineo": "O+",
+  "alergias": "Nenhuma"
+}
+```
+
+#### Exemplo 4: Criar uma Consulta
+
+**Request:**
+- Método: `POST`
+- URL: `http://localhost:8080/api/consultas`
+- Headers:
+  - `Content-Type: application/json`
+- Body (raw JSON):
+```json
+{
+  "idPaciente": 1,
+  "idMedico": 1,
+  "idLocalizacao": 1,
+  "idEspecialidade": 1,
+  "dataHora": "2025-12-15T14:30:00",
+  "duracaoMinutos": 30,
+  "status": "Agendada",
+  "observacoes": "Primeira consulta",
+  "prioridade": "Normal"
+}
+```
+
+**Response esperado (201 Created):**
+```json
+{
+  "idConsulta": 1001,
+  "idPaciente": 1,
+  "idMedico": 1,
+  "idLocalizacao": 1,
+  "idEspecialidade": 1,
+  "dataHora": "2025-12-15T14:30:00",
+  "duracaoMinutos": 30,
+  "status": "Agendada",
+  "observacoes": "Primeira consulta",
+  "prioridade": "Normal"
+}
+```
+
+#### Exemplo 5: Atualizar uma Consulta
+
+**Request:**
+- Método: `PUT`
+- URL: `http://localhost:8080/api/consultas/1001`
+- Headers:
+  - `Content-Type: application/json`
+- Body (raw JSON):
+```json
+{
+  "idPaciente": 1,
+  "idMedico": 1,
+  "idLocalizacao": 1,
+  "idEspecialidade": 1,
+  "dataHora": "2025-12-20T10:00:00",
+  "duracaoMinutos": 30,
+  "status": "Agendada",
+  "observacoes": "Consulta reagendada",
+  "prioridade": "Normal"
+}
+```
+
+**Response esperado (200 OK):**
+```json
+{
+  "idConsulta": 1001,
+  "idPaciente": 1,
+  "idMedico": 1,
+  "idLocalizacao": 1,
+  "idEspecialidade": 1,
+  "dataHora": "2025-12-20T10:00:00",
+  "duracaoMinutos": 30,
+  "status": "Agendada",
+  "observacoes": "Consulta reagendada",
+  "prioridade": "Normal"
+}
+```
+
+#### Exemplo 6: Cancelar uma Consulta
+
+**Request:**
+- Método: `PUT`
+- URL: `http://localhost:8080/api/consultas/1001/cancelar`
+- Headers:
+  - `Content-Type: text/plain`
+- Body (raw text):
+```
+Paciente não pode comparecer
+```
+
+**Response esperado (200 OK):**
+```
+Consulta cancelada com sucesso
+```
+
+#### Exemplo 7: Buscar Médico por CRM
+
+**Request:**
+- Método: `GET`
+- URL: `http://localhost:8080/api/medicos/crm/CRM12345`
+- Headers: (nenhum necessário)
+
+**Response esperado (200 OK):**
+```json
+{
+  "idMedico": 1,
+  "nomeCompleto": "Dr. Carlos Silva",
+  "crm": "CRM12345",
+  "telefone": "1133334444",
+  "email": "carlos.silva@email.com"
+}
+```
+
+#### Exemplo 8: Listar Consultas por Paciente
+
+**Request:**
+- Método: `GET`
+- URL: `http://localhost:8080/api/consultas/paciente/1`
+- Headers: (nenhum necessário)
+
+**Response esperado (200 OK):**
+```json
+[
+  {
+    "idConsulta": 1001,
+    "idPaciente": 1,
+    "idMedico": 1,
+    "idLocalizacao": 1,
+    "idEspecialidade": 1,
+    "dataHora": "2025-12-15T14:30:00",
+    "duracaoMinutos": 30,
+    "status": "Agendada",
+    "observacoes": "Primeira consulta",
+    "prioridade": "Normal"
+  }
+]
+```
+
+### 8.2 Dicas para Testar no Postman
+
+1. **Criar uma Collection**: Organize todos os endpoints em uma collection no Postman
+2. **Variáveis de Ambiente**: Crie uma variável `baseUrl` com valor `http://localhost:8080/api`
+3. **Testes Automatizados**: Adicione testes nas requisições para verificar:
+   - Status codes (200, 201, 404, etc.)
+   - Estrutura da resposta JSON
+   - Valores esperados
+4. **Formato de Data**: Use o formato ISO 8601: `YYYY-MM-DDTHH:mm:ss`
+   - Exemplo: `2025-12-15T14:30:00`
+5. **Headers**: Sempre inclua `Content-Type: application/json` para requisições POST/PUT
+6. **Body**: Use "raw" e selecione "JSON" no Postman para requisições com corpo
+
+### 8.3 Resumo de Endpoints
+
+| Recurso | GET (Listar) | GET (Por ID) | POST (Criar) | PUT (Atualizar) | DELETE | Endpoints Especiais |
+|---------|--------------|--------------|--------------|-----------------|--------|---------------------|
+| **Pacientes** | `/api/pacientes` | `/api/pacientes/{id}` | `/api/pacientes` | `/api/pacientes/{id}` | `/api/pacientes/{id}` | `/api/pacientes/buscar?nome={nome}` |
+| **Médicos** | `/api/medicos` | `/api/medicos/{id}` | `/api/medicos` | `/api/medicos/{id}` | `/api/medicos/{id}` | `/api/medicos/crm/{crm}`, `/api/medicos/especialidade/{id}` |
+| **Consultas** | `/api/consultas` | `/api/consultas/{id}` | `/api/consultas` | `/api/consultas/{id}` | `/api/consultas/{id}` | `/api/consultas/paciente/{id}`, `/api/consultas/medico/{id}`, `/api/consultas/status/{status}`, `/api/consultas/{id}/cancelar` |
+| **Especialidades** | `/api/especialidades` | `/api/especialidades/{id}` | `/api/especialidades` | `/api/especialidades/{id}` | `/api/especialidades/{id}` | - |
+| **Localizações** | `/api/localizacoes` | `/api/localizacoes/{id}` | `/api/localizacoes` | `/api/localizacoes/{id}` | `/api/localizacoes/{id}` | `/api/localizacoes/cidade/{cidade}` |
+
+**Total: 33+ endpoints REST disponíveis**
+
+---
+
+<a name="funcionalidades"></a>
+## ✨ 9. FUNCIONALIDADES IMPLEMENTADAS
+
+### 9.1 Camada Model (10 pontos) ✅
 
 **8 classes DTO completas:**
 
@@ -483,7 +882,7 @@ Quando executar o sistema, você verá:
 - ✅ Método `toString()` em todas as classes
 - ✅ Uso correto de `LocalDate` e `LocalDateTime`
 
-### 7.2 Camada DAO (15 pontos) ✅
+### 9.2 Camada DAO (15 pontos) ✅
 
 **9 classes DAO implementadas:**
 
@@ -517,7 +916,7 @@ Todos os DAOs possuem:
 - ✅ Commit manual controlado
 - ✅ Exceções personalizadas (`DatabaseException`)
 
-### 7.3 Camada Service (15 pontos) ✅
+### 9.3 Camada Service (15 pontos) ✅
 
 **5 classes Service com validações completas:**
 
@@ -561,9 +960,9 @@ Todos os DAOs possuem:
 - `BusinessRuleException` - Violação de regra de negócio
 - `DatabaseException` - Erros de banco de dados
 
-### 7.4 API RESTful (30 pontos) ✅
+### 9.4 API RESTful (30 pontos) ✅
 
-**5 Resources REST implementados com 40+ endpoints:**
+**5 Resources REST implementados com 33+ endpoints:**
 
 **Características da API:**
 - ✅ **Verbos HTTP corretos**:
@@ -594,7 +993,7 @@ Todos os DAOs possuem:
 - `EspecialidadeResource`: 5 endpoints
 - `LocalizacaoResource`: 6 endpoints
 
-### 7.5 Boas Práticas (20 pontos) ✅
+### 9.5 Boas Práticas (20 pontos) ✅
 
 **Nomenclatura:**
 - ✅ Classes: `PascalCase` (ex: `PacienteService`)
@@ -629,9 +1028,9 @@ Todos os DAOs possuem:
 ---
 
 <a name="troubleshooting"></a>
-## 🔧 8. TROUBLESHOOTING
+## 🔧 10. TROUBLESHOOTING
 
-### 8.1 Problemas de Compilação
+### 10.1 Problemas de Compilação
 
 #### Erro: "javac: command not found"
 **Causa**: Java JDK não instalado ou não no PATH
@@ -655,7 +1054,7 @@ ls lib/ojdbc8.jar
 javac -cp "lib/ojdbc8.jar" ...
 ```
 
-### 8.2 Problemas de Banco de Dados
+### 10.2 Problemas de Banco de Dados
 
 #### Erro: "ORA-00942: table or view does not exist"
 **Causa**: Tabelas não foram criadas
@@ -701,7 +1100,7 @@ private static final String USUARIO = "seu_rm_correto";
 private static final String SENHA = "sua_senha_correta";
 ```
 
-### 8.3 Problemas de Execução
+### 10.3 Problemas de Execução
 
 #### Erro: "ClassNotFoundException: oracle.jdbc.driver.OracleDriver"
 **Causa**: Driver JDBC não está no classpath
@@ -723,7 +1122,54 @@ sqlplus seu_rm/senha@oracle.fiap.com.br:1521/ORCL
 # Verificar se está na rede da FIAP ou VPN
 ```
 
-### 8.4 Problemas de Git
+### 10.4 Problemas com a API REST
+
+#### Erro: "Porta 8080 já está em uso"
+**Causa**: Outro serviço está usando a porta 8080
+
+**Solução**:
+```java
+// Edite src/br/com/fiap/main/ApiServer.java
+private static final int PORT = 8081; // ou outra porta disponível
+```
+
+#### Erro: "Connection refused" no Postman
+**Causa**: Servidor não está rodando
+
+**Solução**:
+```bash
+# Verificar se o servidor está rodando
+# Execute: mvn exec:java -Dexec.mainClass="br.com.fiap.main.ApiServer"
+
+# Verificar se a porta está correta
+# Verifique a mensagem no console quando o servidor iniciar
+```
+
+#### Erro: "404 Not Found" no Postman
+**Causa**: URL incorreta ou endpoint não existe
+
+**Solução**:
+- Verifique se a URL está correta: `http://localhost:8080/api/pacientes`
+- Verifique se o servidor está rodando
+- Verifique se o endpoint existe no Resource correspondente
+
+#### Erro: "500 Internal Server Error"
+**Causa**: Erro no servidor (geralmente banco de dados ou validação)
+
+**Solução**:
+- Verifique os logs do servidor no console
+- Verifique a conexão com o banco de dados
+- Verifique se os dados enviados estão no formato correto
+- Verifique se as validações estão sendo atendidas
+
+#### Erro: "415 Unsupported Media Type"
+**Causa**: Content-Type incorreto
+
+**Solução**:
+- Adicione o header: `Content-Type: application/json`
+- Verifique se o body está em formato JSON válido
+
+### 10.5 Problemas de Git
 
 #### Erro: "Permission denied to lincolnroncato"
 **Causa**: Credenciais antigas no Keychain
@@ -735,7 +1181,7 @@ git remote set-url origin git@github.com:samaravilela/fiap-challenge-sprint5-jav
 git push origin main
 ```
 
-### 8.5 Comandos Úteis para Debug
+### 10.6 Comandos Úteis para Debug
 
 ```bash
 # Ver configuração atual do Git
@@ -758,9 +1204,9 @@ UNION ALL SELECT 'MEDICOS', COUNT(*) FROM T_EASEHC_MEDICO;
 ---
 
 <a name="tecnologias"></a>
-## 🎨 9. TECNOLOGIAS E PADRÕES
+## 🎨 11. TECNOLOGIAS E PADRÕES
 
-### 9.1 Tecnologias Utilizadas
+### 11.1 Tecnologias Utilizadas
 
 | Tecnologia | Versão | Uso |
 |------------|--------|-----|
@@ -768,10 +1214,12 @@ UNION ALL SELECT 'MEDICOS', COUNT(*) FROM T_EASEHC_MEDICO;
 | Oracle Database | 21c | Banco de dados |
 | JDBC | ojdbc8 | Conectividade com BD |
 | JAX-RS (Jersey) | 2.35 | API RESTful |
+| Jetty Embedded | 9.4.48 | Servidor web embutido |
+| Jackson | 2.13.0 | Serialização JSON |
 | Maven | 3.6+ | Gerenciamento de dependências |
 | Git | - | Controle de versão |
 
-### 9.2 Padrões de Projeto Aplicados
+### 11.2 Padrões de Projeto Aplicados
 
 #### DAO (Data Access Object)
 ```
@@ -806,7 +1254,7 @@ Implementação: Services injetam DAOs necessários
 Benefício: Baixo acoplamento, facilita testes
 ```
 
-### 9.3 Princípios SOLID
+### 11.3 Princípios SOLID
 
 - ✅ **S**ingle Responsibility Principle - Cada classe tem uma única responsabilidade
 - ✅ **O**pen/Closed Principle - Abertas para extensão, fechadas para modificação
@@ -814,7 +1262,7 @@ Benefício: Baixo acoplamento, facilita testes
 - ✅ **I**nterface Segregation Principle - Interfaces específicas e focadas
 - ✅ **D**ependency Inversion Principle - Dependências de abstrações
 
-### 9.4 Arquitetura em Camadas
+### 11.4 Arquitetura em Camadas
 
 ```
 ┌─────────────────────────────────────────┐
@@ -833,20 +1281,22 @@ Benefício: Baixo acoplamento, facilita testes
 ---
 
 <a name="checklist"></a>
-## ✅ 10. CHECKLIST FINAL
+## ✅ 12. CHECKLIST FINAL
 
-### 10.1 Código-Fonte
+### 12.1 Código-Fonte
 
 - [x] 8 Classes Model (DTOs) completas e alinhadas com BD
 - [x] 9 Classes DAO com CRUD completo
 - [x] 5 Classes Service com validações e regras de negócio
 - [x] 5 Classes Resource com API RESTful
+- [x] 1 Classe de configuração JAX-RS (JaxRsApplication)
+- [x] 1 Servidor REST embutido (ApiServer com Jetty)
 - [x] 4 Classes de exceções personalizadas
 - [x] Tratamento de exceções em todas as camadas
 - [x] Padrões de projeto aplicados corretamente
 - [x] Código documentado com JavaDoc
 
-### 10.2 Banco de Dados
+### 12.2 Banco de Dados
 
 - [x] Script SQL completo (DDL + DML)
 - [x] 9 tabelas criadas corretamente
@@ -854,35 +1304,39 @@ Benefício: Baixo acoplamento, facilita testes
 - [x] Dados de teste populados
 - [x] Constraints e foreign keys implementadas
 
-### 10.3 Configuração
+### 12.3 Configuração
 
-- [x] pom.xml configurado com todas dependências
+- [x] pom.xml configurado com todas dependências (Jersey, Jetty, Jackson)
 - [x] .gitignore configurado
 - [x] Driver JDBC incluído (lib/ojdbc8.jar)
 - [x] Credenciais do banco configuradas
 
-### 10.4 Documentação
+### 12.4 Documentação
 
 - [x] README.md completo e atualizado
 - [x] GUIA_COMPLETO.md (este arquivo)
 - [x] Comentários no código
 - [x] JavaDoc nas classes principais
 
-### 10.5 Funcionalidades
+### 12.5 Funcionalidades
 
 - [x] CRUD completo funcionando
 - [x] Validações implementadas
 - [x] Regras de negócio aplicadas
 - [x] API REST com todos endpoints
+- [x] Servidor REST embutido funcionando (Jetty)
+- [x] API testável no Postman
 - [x] Sistema console funcionando
 
-### 10.6 Testes
+### 12.6 Testes
 
 - [x] Teste de conexão com banco
 - [x] Teste de listagem de dados
 - [x] Teste de inserção (cadastro)
 - [x] Teste de atualização
 - [x] Teste de deleção
+- [x] Teste da API REST no Postman
+- [x] Teste de todos os endpoints REST
 
 ---
 
@@ -894,7 +1348,9 @@ Benefício: Baixo acoplamento, facilita testes
 2. **Regras de Negócio Complexas**: Conflito de horários, integridade referencial
 3. **Tratamento Completo de Exceções**: 4 tipos de exceções com mensagens descritivas
 4. **Código Limpo**: JavaDoc, nomenclatura clara, separação de responsabilidades
-5. **Documentação Completa**: Este guia único com todas as informações
+5. **API REST Completa**: 33+ endpoints REST testáveis no Postman
+6. **Servidor Embutido**: API pode ser executada localmente sem servidor externo
+7. **Documentação Completa**: Este guia único com todas as informações e exemplos práticos
 
 ### Contato e Suporte
 
@@ -919,8 +1375,10 @@ Para dúvidas:
 **Total de Classes Java**: 30+  
 **Total de Linhas de Código**: ~5.000+  
 **Total de Métodos**: 150+  
-**Total de Endpoints REST**: 40+  
+**Total de Endpoints REST**: 33+  
 **Total de Validações**: 50+  
+**Servidor REST**: Jetty Embedded (Porta 8080)  
+**Testável no Postman**: ✅ Sim  
 **Cobertura dos Requisitos**: 100%  
 
 **Pontuação Final**: **90/90 (100%)** ✅
