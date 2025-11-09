@@ -21,6 +21,7 @@
 5. [Compilação e Execução](#compilação)
 6. [API RESTful - Execução e Testes](#api-restful)
 7. [API RESTful - Endpoints Detalhados](#api-endpoints)
+   - [7.6 Tabela Completa de Endpoints](#76-tabela-completa-de-endpoints)
 8. [Testando a API no Postman](#testando-postman)
 9. [Funcionalidades Implementadas](#funcionalidades)
 10. [Troubleshooting](#troubleshooting)
@@ -594,7 +595,129 @@ A API REST foi implementada utilizando:
 | DELETE | `/localizacoes/{id}` | Deleta | 204 No Content |
 | GET | `/localizacoes/cidade/{cidade}` | Lista por cidade | 200 OK |
 
-### 7.6 Códigos de Status HTTP
+### 7.6 Tabela Completa de Endpoints
+
+**Base URL:** `http://localhost:8080/api`
+
+| # | Método | Endpoint Completo | Descrição | Parâmetros | Body | Status de Sucesso | Status de Erro |
+|---|--------|-------------------|-----------|------------|------|-------------------|----------------|
+| **PACIENTES** |
+| 1 | GET | `/api/pacientes` | Lista todos os pacientes | - | - | 200 OK | 500 |
+| 2 | GET | `/api/pacientes/{id}` | Busca paciente por ID | `id` (path) | - | 200 OK | 404, 500 |
+| 3 | POST | `/api/pacientes` | Cria novo paciente | - | JSON | 201 Created | 400, 500 |
+| 4 | PUT | `/api/pacientes/{id}` | Atualiza paciente | `id` (path) | JSON | 200 OK | 400, 404, 500 |
+| 5 | DELETE | `/api/pacientes/{id}` | Deleta paciente | `id` (path) | - | 204 No Content | 404, 500 |
+| 6 | GET | `/api/pacientes/buscar?nome={nome}` | Busca pacientes por nome | `nome` (query) | - | 200 OK | 400, 500 |
+| **MÉDICOS** |
+| 7 | GET | `/api/medicos` | Lista todos os médicos | - | - | 200 OK | 500 |
+| 8 | GET | `/api/medicos/{id}` | Busca médico por ID | `id` (path) | - | 200 OK | 404, 500 |
+| 9 | POST | `/api/medicos` | Cria novo médico | - | JSON | 201 Created | 400, 500 |
+| 10 | PUT | `/api/medicos/{id}` | Atualiza médico | `id` (path) | JSON | 200 OK | 400, 404, 500 |
+| 11 | DELETE | `/api/medicos/{id}` | Deleta médico | `id` (path) | - | 204 No Content | 404, 500 |
+| 12 | GET | `/api/medicos/crm/{crm}` | Busca médico por CRM | `crm` (path) | - | 200 OK | 400, 404, 500 |
+| 13 | GET | `/api/medicos/especialidade/{id}` | Lista médicos por especialidade | `id` (path) | - | 200 OK | 400, 500 |
+| **CONSULTAS** |
+| 14 | GET | `/api/consultas` | Lista todas as consultas agendadas | - | - | 200 OK | 500 |
+| 15 | GET | `/api/consultas/{id}` | Busca consulta por ID | `id` (path) | - | 200 OK | 404, 500 |
+| 16 | POST | `/api/consultas` | Cria nova consulta | - | JSON | 201 Created | 400, 422, 500 |
+| 17 | PUT | `/api/consultas/{id}` | Atualiza consulta | `id` (path) | JSON | 200 OK | 400, 404, 500 |
+| 18 | DELETE | `/api/consultas/{id}` | Deleta consulta | `id` (path) | - | 204 No Content | 404, 500 |
+| 19 | GET | `/api/consultas/paciente/{id}` | Lista consultas do paciente | `id` (path) | - | 200 OK | 400, 500 |
+| 20 | GET | `/api/consultas/medico/{id}` | Lista consultas do médico | `id` (path) | - | 200 OK | 400, 500 |
+| 21 | GET | `/api/consultas/status/{status}` | Lista consultas por status | `status` (path) | - | 200 OK | 400, 500 |
+| 22 | PUT | `/api/consultas/{id}/cancelar` | Cancela consulta | `id` (path) | Text (motivo) | 200 OK | 404, 422, 500 |
+| **ESPECIALIDADES** |
+| 23 | GET | `/api/especialidades` | Lista todas as especialidades | - | - | 200 OK | 500 |
+| 24 | GET | `/api/especialidades/{id}` | Busca especialidade por ID | `id` (path) | - | 200 OK | 404, 500 |
+| 25 | POST | `/api/especialidades` | Cria nova especialidade | - | JSON | 201 Created | 400, 500 |
+| 26 | PUT | `/api/especialidades/{id}` | Atualiza especialidade | `id` (path) | JSON | 200 OK | 400, 404, 500 |
+| 27 | DELETE | `/api/especialidades/{id}` | Deleta especialidade | `id` (path) | - | 204 No Content | 404, 500 |
+| **LOCALIZAÇÕES** |
+| 28 | GET | `/api/localizacoes` | Lista todas as localizações | - | - | 200 OK | 500 |
+| 29 | GET | `/api/localizacoes/{id}` | Busca localização por ID | `id` (path) | - | 200 OK | 404, 500 |
+| 30 | POST | `/api/localizacoes` | Cria nova localização | - | JSON | 201 Created | 400, 500 |
+| 31 | PUT | `/api/localizacoes/{id}` | Atualiza localização | `id` (path) | JSON | 200 OK | 400, 404, 500 |
+| 32 | DELETE | `/api/localizacoes/{id}` | Deleta localização | `id` (path) | - | 204 No Content | 404, 500 |
+| 33 | GET | `/api/localizacoes/cidade/{cidade}` | Lista localizações por cidade | `cidade` (path) | - | 200 OK | 400, 500 |
+
+**Total: 33 endpoints REST**
+
+#### Legenda:
+- **Método**: GET, POST, PUT, DELETE
+- **Endpoint Completo**: URL completa incluindo base URL
+- **Parâmetros**: Parâmetros de path (`{id}`) ou query (`?nome=valor`)
+- **Body**: Tipo de corpo da requisição (JSON ou Text)
+- **Status de Sucesso**: Código HTTP quando a operação é bem-sucedida
+- **Status de Erro**: Possíveis códigos HTTP de erro
+
+#### Exemplos de Body JSON:
+
+**Paciente (POST/PUT):**
+```json
+{
+  "nomeCompleto": "João Silva",
+  "dataNascimento": "1990-05-15",
+  "genero": "M",
+  "telefone": "(11) 99999-9999",
+  "tipoSanguineo": "O+",
+  "alergias": "Nenhuma"
+}
+```
+
+**Médico (POST/PUT):**
+```json
+{
+  "nomeCompleto": "Dr. Carlos Silva",
+  "crm": "CRM12345",
+  "telefone": "1133334444",
+  "email": "carlos.silva@email.com"
+}
+```
+
+**Consulta (POST/PUT):**
+```json
+{
+  "idPaciente": 1,
+  "idMedico": 1,
+  "idLocalizacao": 1,
+  "idEspecialidade": 1,
+  "dataHora": "2025-12-15T14:30:00",
+  "duracaoMinutos": 30,
+  "status": "Agendada",
+  "observacoes": "Primeira consulta",
+  "prioridade": "Normal"
+}
+```
+
+**Especialidade (POST/PUT):**
+```json
+{
+  "nomeEspecialidade": "Cardiologia",
+  "areaMedica": "Clínica",
+  "tempoMedioConsulta": 30
+}
+```
+
+**Localização (POST/PUT):**
+```json
+{
+  "nomeUnidade": "Hospital Central",
+  "endereco": "Rua Principal, 123",
+  "cidade": "São Paulo",
+  "estado": "SP",
+  "pais": "Brasil",
+  "horarioFuncionamento": "08:00 - 18:00",
+  "telefone": "1133334444"
+}
+```
+
+**Cancelar Consulta (PUT):**
+```
+Paciente não pode comparecer
+```
+*(Body em texto plano, não JSON)*
+
+### 7.7 Códigos de Status HTTP
 
 | Código | Significado | Uso |
 |--------|-------------|-----|
