@@ -99,6 +99,9 @@ public class ConsultaResource {
             consulta.setIdConsulta(id);
             consultaService.atualizar(consulta);
             return Response.ok(consulta).build();
+        } catch (BusinessRuleException e) {
+            return Response.status(422)
+                    .entity(e.getMessage()).build();
         } catch (ResourceNotFoundException e) {
             return Response.status(Response.Status.NOT_FOUND)
                     .entity(e.getMessage()).build();

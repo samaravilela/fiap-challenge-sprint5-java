@@ -155,6 +155,9 @@ O guia único contém **TUDO que você precisa saber**:
 2. **Banco de dados**: Execute o script `database_schema.sql` no Oracle
 3. **Documentação**: Leia o [`GUIA_COMPLETO.md`](GUIA_COMPLETO.md) para instruções detalhadas
 4. **Problemas?**: Consulte a seção de Troubleshooting no guia completo
+5. **Consultas**:
+   - No `POST /consultas`, informe sempre `idPaciente`, `idEspecialidade`, data/horário, duração, status e prioridade. Os campos `idMedico` e `idLocalizacao` são opcionais e, se omitidos, serão definidos automaticamente com base na disponibilidade.
+   - O `PUT /consultas/{id}` só permite alterações quando a consulta ainda está com status **Agendada**; outros status retornam erro 422.
 
 ---
 

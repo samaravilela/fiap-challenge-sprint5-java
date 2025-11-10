@@ -549,7 +549,7 @@ A API REST foi implementada utilizando:
 
 | Método | Endpoint | Descrição | Status HTTP |
 |--------|----------|-----------|-------------|
-| GET | `/consultas` | Lista todas as consultas AGENDADAS | 200 OK |
+| GET | `/consultas` | Lista todas as consultas (qualquer status) | 200 OK |
 | GET | `/consultas/{id}` | Busca consulta por ID | 200 OK / 404 |
 | POST | `/consultas` | Cria nova consulta | 201 Created / 400 / 422 |
 | PUT | `/consultas/{id}` | Atualiza consulta | 200 OK |
@@ -617,10 +617,10 @@ A API REST foi implementada utilizando:
 | 12 | GET | `/api/medicos/crm/{crm}` | Busca médico por CRM | `crm` (path) | - | 200 OK | 400, 404, 500 |
 | 13 | GET | `/api/medicos/especialidade/{id}` | Lista médicos por especialidade | `id` (path) | - | 200 OK | 400, 500 |
 | **CONSULTAS** |
-| 14 | GET | `/api/consultas` | Lista todas as consultas agendadas | - | - | 200 OK | 500 |
+| 14 | GET | `/api/consultas` | Lista todas as consultas (qualquer status) | - | - | 200 OK | 500 |
 | 15 | GET | `/api/consultas/{id}` | Busca consulta por ID | `id` (path) | - | 200 OK | 404, 500 |
 | 16 | POST | `/api/consultas` | Cria nova consulta | - | JSON | 201 Created | 400, 422, 500 |
-| 17 | PUT | `/api/consultas/{id}` | Atualiza consulta | `id` (path) | JSON | 200 OK | 400, 404, 500 |
+| 17 | PUT | `/api/consultas/{id}` | Atualiza consulta | `id` (path) | JSON | 200 OK | 400, 404, 422, 500 |
 | 18 | DELETE | `/api/consultas/{id}` | Deleta consulta | `id` (path) | - | 204 No Content | 404, 500 |
 | 19 | GET | `/api/consultas/paciente/{id}` | Lista consultas do paciente | `id` (path) | - | 200 OK | 400, 500 |
 | 20 | GET | `/api/consultas/medico/{id}` | Lista consultas do médico | `id` (path) | - | 200 OK | 400, 500 |
@@ -678,8 +678,8 @@ A API REST foi implementada utilizando:
 ```json
 {
   "idPaciente": 1,
-  "idMedico": 1,
-  "idLocalizacao": 1,
+  "idMedico": 7,
+  "idLocalizacao": 3,
   "idEspecialidade": 1,
   "dataHora": "2025-12-15T14:30:00",
   "duracaoMinutos": 30,
@@ -688,6 +688,8 @@ A API REST foi implementada utilizando:
   "prioridade": "Normal"
 }
 ```
+
+> **Observação:** informe sempre `idPaciente` e `idEspecialidade`. Os campos `idMedico` e `idLocalizacao` são opcionais; se ausentes, serão preenchidos automaticamente com opções disponíveis para o horário solicitado.
 
 **Especialidade (POST/PUT):**
 ```json
@@ -830,8 +832,8 @@ Paciente não pode comparecer
 ```json
 {
   "idPaciente": 1,
-  "idMedico": 1,
-  "idLocalizacao": 1,
+  "idMedico": 7,
+  "idLocalizacao": 3,
   "idEspecialidade": 1,
   "dataHora": "2025-12-15T14:30:00",
   "duracaoMinutos": 30,
@@ -846,8 +848,8 @@ Paciente não pode comparecer
 {
   "idConsulta": 1001,
   "idPaciente": 1,
-  "idMedico": 1,
-  "idLocalizacao": 1,
+  "idMedico": 7,
+  "idLocalizacao": 3,
   "idEspecialidade": 1,
   "dataHora": "2025-12-15T14:30:00",
   "duracaoMinutos": 30,
@@ -856,6 +858,8 @@ Paciente não pode comparecer
   "prioridade": "Normal"
 }
 ```
+
+> **Importante:** os campos `idMedico` e `idLocalizacao` são opcionais. Se não forem enviados, a API seleciona automaticamente profissionais e unidades disponíveis no horário solicitado. Caso nenhum esteja livre, retorna 422 sugerindo reagendar em outro horário.
 
 #### Exemplo 5: Atualizar uma Consulta
 
@@ -878,6 +882,8 @@ Paciente não pode comparecer
   "prioridade": "Normal"
 }
 ```
+
+> **Importante:** somente consultas com status atual **Agendada** podem ser alteradas. Se a consulta estiver *Cancelada* ou *Realizada*, a API retornará erro 422 com a mensagem correspondente.
 
 **Response esperado (200 OK):**
 ```json
@@ -1019,8 +1025,7 @@ Todos os DAOs possuem:
 **Métodos adicionais específicos:**
 - `PacienteDAO`: `buscarPorNome(String nome)`
 - `MedicoDAO`: `buscarPorCrm(String crm)`, `listarPorEspecialidade(Long id)`
-- `ConsultaDAO`: `listarPorPaciente()`, `listarPorMedico()`, `listarPorStatus()`
-  - **Nota**: `listarTodos()` retorna apenas consultas com status "Agendada"
+- `ConsultaDAO`: `listarPorPaciente()`, `listarPorMedico()`, `listarPorStatus()`, `listarTodos()` (retorna todas as consultas)
 - `LocalizacaoDAO`: `listarPorCidade(String cidade)`
 - `CancelamentoDAO`: `listarPorConsulta(Long id)`
 - `HistoricoMedicoDAO`: `listarPorPaciente(Long id)`
@@ -1059,14 +1064,17 @@ Todos os DAOs possuem:
 - ✅ Telefone máximo 15 caracteres
 
 **ConsultaService:**
-- ✅ Validação de todos os IDs relacionados
+- ✅ Validação de todos os IDs relacionados (paciente, médico, localização, especialidade)
+- ✅ Atribuição automática de médico e localização livres quando não informados
 - ✅ Data e hora não podem ser no passado
 - ✅ Duração deve ser maior que zero
 - ✅ Status válido: Agendada, Cancelada, Realizada
 - ✅ Prioridade válida: Alta, Baixa, Normal
 - ✅ **Regra de Negócio**: Conflito de horários (médico não pode ter 2 consultas sobrepostas)
+- ✅ **Regra de Negócio**: Localização não pode receber duas consultas no mesmo horário
 - ✅ **Regra de Negócio**: Não pode cancelar consulta já realizada
 - ✅ Verificação de integridade referencial (paciente e médico devem existir)
+- ✅ Atualização permitida apenas para consultas com status "Agendada" (gera 422 caso contrário)
 
 **EspecialidadeService:**
 - ✅ Nome obrigatório (máx. 100 caracteres)

@@ -82,14 +82,14 @@ public class ConsultaDAO {
     }
     
     /**
-     * Lista todas as consultas agendadas
-     * @return Lista de consultas com status "Agendada"
+     * Lista todas as consultas cadastradas
+     * @return Lista de consultas independente do status
      */
     public List<Consulta> listarTodos() {
         List<Consulta> consultas = new ArrayList<>();
         String sql = "SELECT ID_CONSULTA, ID_PACIENTE, ID_MEDICO, ID_LOCAL, ID_ESP, DT_HORA, " +
                      "DUR_MINUTOS, STATUS, OBSERVACOES, PRIORIDADE " +
-                     "FROM T_EASEHC_CONSULTA WHERE STATUS = 'Agendada' ORDER BY DT_HORA DESC";
+                     "FROM T_EASEHC_CONSULTA ORDER BY DT_HORA DESC";
         
         try (Connection conn = ConexaoBD.getConexao();
              Statement stmt = conn.createStatement();
@@ -284,6 +284,34 @@ public class ConsultaDAO {
             
         } catch (SQLException e) {
             throw new DatabaseException("Erro ao listar consultas por status: " + e.getMessage(), e);
+        }
+    }
+    
+    /**
+     * Lista consultas por localização
+     * @param idLocalizacao ID da localização
+     * @return Lista de consultas
+     */
+    public List<Consulta> listarPorLocalizacao(Long idLocalizacao) {
+        List<Consulta> consultas = new ArrayList<>();
+        String sql = "SELECT ID_CONSULTA, ID_PACIENTE, ID_MEDICO, ID_LOCAL, ID_ESP, DT_HORA, " +
+                     "DUR_MINUTOS, STATUS, OBSERVACOES, PRIORIDADE " +
+                     "FROM T_EASEHC_CONSULTA WHERE ID_LOCAL = ? ORDER BY DT_HORA DESC";
+
+        try (Connection conn = ConexaoBD.getConexao();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setLong(1, idLocalizacao);
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                consultas.add(extrairConsultaDoResultSet(rs));
+            }
+
+            return consultas;
+
+        } catch (SQLException e) {
+            throw new DatabaseException("Erro ao listar consultas por localização: " + e.getMessage(), e);
         }
     }
     
