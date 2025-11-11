@@ -3,6 +3,10 @@ package br.com.fiap.config;
 import br.com.fiap.resource.*;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.jackson.JacksonFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import org.glassfish.jersey.jackson.internal.jackson.jaxrs.json.JacksonJaxbJsonProvider;
 
 /**
  * Configuração da aplicação JAX-RS
@@ -27,6 +31,17 @@ public class JaxRsApplication extends ResourceConfig {
 
         // Registrar suporte a JSON via Jackson
         register(JacksonFeature.class);
+        register(createJacksonProvider());
+    }
+
+    private JacksonJaxbJsonProvider createJacksonProvider() {
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule(new JavaTimeModule());
+        mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+
+        JacksonJaxbJsonProvider provider = new JacksonJaxbJsonProvider();
+        provider.setMapper(mapper);
+        return provider;
     }
 }
 
