@@ -2,6 +2,7 @@ package br.com.fiap.config;
 
 import br.com.fiap.resource.*;
 import org.glassfish.jersey.server.ResourceConfig;
+import org.glassfish.jersey.jackson.JacksonFeature;
 
 /**
  * Configuração da aplicação JAX-RS
@@ -23,6 +24,9 @@ public class JaxRsApplication extends ResourceConfig {
 
         // Registrar filtros globais
         register(CorsFilter.class);
+
+        // Registrar suporte a JSON via Jackson
+        register(JacksonFeature.class);
     }
 }
 
