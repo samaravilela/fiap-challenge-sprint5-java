@@ -8,7 +8,7 @@
     <groupId>br.com.fiap</groupId>
     <artifactId>easehc-api</artifactId>
     <version>1.0.0</version>
-    <packaging>war</packaging>
+    <packaging>jar</packaging>
 
     <name>EaseHC - Sistema de Gestão de Consultas Médicas</name>
     <description>API RESTful para sistema de agendamento e gestão de consultas médicas</description>
@@ -124,16 +124,6 @@
                 </configuration>
             </plugin>
 
-            <!-- Maven WAR Plugin -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-war-plugin</artifactId>
-                <version>3.3.1</version>
-                <configuration>
-                    <failOnMissingWebXml>false</failOnMissingWebXml>
-                </configuration>
-            </plugin>
-
             <!-- Maven Surefire Plugin for tests -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -149,6 +139,29 @@
                 <configuration>
                     <mainClass>br.com.fiap.main.ApiServer</mainClass>
                 </configuration>
+            </plugin>
+
+            <!-- Maven Shade Plugin para gerar JAR executável com dependências -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>3.6.0</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <createDependencyReducedPom>false</createDependencyReducedPom>
+                            <transformers>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                    <mainClass>br.com.fiap.main.ApiServer</mainClass>
+                                </transformer>
+                            </transformers>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
