@@ -16,9 +16,21 @@ import org.glassfish.jersey.servlet.ServletContainer;
  * @author Altamir Lima - RM 562906
  */
 public class ApiServer {
-    
-    private static final int PORT = 8080;
-    
+
+    private static final int PORT = resolvePort();
+
+    private static int resolvePort() {
+        String port = System.getenv("PORT");
+        if (port != null) {
+            try {
+                return Integer.parseInt(port);
+            } catch (NumberFormatException ignored) {
+                System.err.println("⚠️  Valor inválido para variável de ambiente PORT (" + port + "). Usando porta padrão 8080.");
+            }
+        }
+        return 8080;
+    }
+
     public static void main(String[] args) {
         System.out.println("╔═══════════════════════════════════════════════════════╗");
         System.out.println("║   API REST - SISTEMA DE AGENDAMENTO DE CONSULTAS     ║");
@@ -60,7 +72,8 @@ public class ApiServer {
             System.out.println("✓ Servidor iniciado com sucesso!");
             System.out.println("═══════════════════════════════════════════════════════");
             System.out.println();
-            System.out.println("📍 URL Base: http://localhost:" + PORT + "/api");
+            System.out.println("📍 Porta de escuta: " + PORT);
+            System.out.println("📍 URL Base local: http://localhost:" + PORT + "/api");
             System.out.println();
             System.out.println("📋 Endpoints disponíveis:");
             System.out.println("   GET    http://localhost:" + PORT + "/api/consultas");

@@ -19,6 +19,7 @@ public class JaxRsApplication extends ResourceConfig {
         register(MedicoResource.class);
         register(EspecialidadeResource.class);
         register(LocalizacaoResource.class);
+        register(HealthResource.class);
 
         // Registrar filtros globais
         register(CorsFilter.class);
